@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chalk Talk Playbook</title>
+<meta name="description" content="Study, animate and quiz yourself on your team's basketball plays.">
+<meta name="theme-color" content="#18222c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Chalk Talk">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=Kalam:wght@700&display=swap">
+<style>
+/* Layout: playbook list on the left, the court as the hero in the middle, a coach's clipboard panel on the right. */
+:root {
+  --bg: #e9edf1; --surface: #ffffff; --surface-2: #f3f6f8; --ink: #18222c; --muted: #566472; --line: #cfd7de;
+  --accent: #b84f15; --accent-ink: #ffffff; --ball: #e8742a;
+  --off: #1d5bbf; --def: #c7322b; --court: #fbfcfd; --court-line: #7d8b97; --paint: #eef2f6; --apron: #dfe5ea;
+  --good: #2e7d4f; --warn: #9a6200; --bad: #c7322b;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --hand: "Kalam", "Comic Sans MS", "Segoe Print", cursive;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10151a; --surface: #182029; --surface-2: #1f2832; --ink: #e4eaef; --muted: #95a3af; --line: #2d3a47;
+  --accent: #f08a3e; --accent-ink: #1a0e05; --ball: #f08a3e;
+  --off: #86b6ff; --def: #ff7d73; --court: #1b252d; --court-line: #a9b8c4; --paint: #222e38; --apron: #141c22;
+  --good: #5cc489; --warn: #e0a53a; --bad: #ff7d73; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10151a; --surface: #182029; --surface-2: #1f2832; --ink: #e4eaef; --muted: #95a3af; --line: #2d3a47;
+  --accent: #f08a3e; --accent-ink: #1a0e05; --ball: #f08a3e;
+  --off: #86b6ff; --def: #ff7d73; --court: #1b252d; --court-line: #a9b8c4; --paint: #222e38; --apron: #141c22;
+  --good: #5cc489; --warn: #e0a53a; --bad: #ff7d73; color-scheme: dark }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html, body { min-height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) }
+img { max-width: 100% }
+button, input, select, textarea { font: inherit; color: inherit }
+button { cursor: pointer }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: .01em }
+a { color: var(--accent) }
+
+.top { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; padding-block: 14px }
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap }
+.brand h1 { font-size: 30px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em }
+.brand h1 span { color: var(--accent) }
+.brand small { color: var(--muted); font-size: 13px }
+.top .spacer { flex: 1 }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 3px 10px; font-size: 12.5px; color: var(--muted); white-space: nowrap }
+.chip b { color: var(--ink); font-weight: 600 }
+.chip.coach { border-color: var(--accent); color: var(--accent); font-weight: 600 }
+
+.app { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start }
+.lib { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; max-height: calc(100vh - 100px); position: sticky; top: 12px; min-width: 0 }
+.lib-head { padding: 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line) }
+.lib-head .row { display: flex; gap: 8px; align-items: center; justify-content: space-between }
+.lib-head h2 { font-size: 20px; text-transform: uppercase }
+.seg { display: flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 2px; gap: 2px }
+.seg button { flex: 1; border: 0; background: transparent; padding: 5px 8px; border-radius: 6px; font-size: 13px; color: var(--muted) }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(0 0 0 / .12) }
+.search { width: 100%; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2) }
+.unpub { border: 1px dashed var(--accent); border-radius: 8px; padding: 8px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 6px }
+.unpub b { color: var(--accent) }
+.unpub .controls .btn { padding: 5px 9px; font-size: 13px }
+.list { overflow: auto; padding: 6px; display: flex; flex-direction: column; gap: 2px }
+.item { text-align: left; border: 0; background: transparent; border-radius: 8px; padding: 8px 10px; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center }
+.item:hover { background: var(--surface-2) }
+.item[aria-current="true"] { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent) }
+.item .nm { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.item .meta { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap }
+.side { font-family: var(--display); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 1px 7px; border-radius: 4px; border: 1.5px solid currentColor }
+.side.o { color: var(--off) } .side.d { color: var(--def) }
+.tag-ex { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border: 1px dashed var(--line); border-radius: 4px; padding: 0 5px }
+.done { color: var(--good); font-weight: 600 }
+.empty { padding: 18px 12px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 10px }
+
+.stage { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--line); overflow-x: auto }
+.tabs button { border: 0; background: none; padding: 8px 14px; font-family: var(--display); font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap }
+.tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--accent) }
+.work { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start }
+.board-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0 }
+#board { display: block; width: 100%; max-width: 100%; height: auto; max-height: 76vh; margin: 0 auto; touch-action: none; user-select: none; -webkit-user-select: none }
+.board-cap { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); padding: 6px 4px 0 }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0 }
+.panel h2 { font-size: 26px; line-height: 1.1 }
+.panel .sub { color: var(--muted); font-size: 13.5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.panel p { margin: 0 }
+.lbl { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600 }
+.field { display: flex; flex-direction: column; gap: 5px }
+.field input:not([type=checkbox]):not([type=range]):not([type=file]), .field select, .field textarea, select.inline { padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-2); width: 100% }
+.field textarea { resize: vertical; min-height: 60px }
+textarea.code { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px }
+input[type=file] { font-size: 13px; max-width: 100% }
+.steps { display: flex; gap: 4px; flex-wrap: wrap }
+.steps button { min-width: 34px; height: 30px; padding: 0 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface-2); font-family: var(--hand); font-size: 15px; line-height: 1 }
+.steps button[aria-current="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink) }
+.steps button.add { font-family: var(--body); font-size: 13px; color: var(--accent); border-style: dashed }
+.controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap }
+.btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 7px 12px; font-weight: 600; font-size: 14px; display: inline-flex; gap: 6px; align-items: center; justify-content: center; text-decoration: none; color: var(--ink) }
+.btn:hover { border-color: var(--muted) }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.btn.danger { color: var(--bad) }
+.btn.danger.solid { background: var(--bad); color: var(--surface); border-color: var(--bad) }
+.btn[disabled] { opacity: .45; cursor: not-allowed }
+.btn.icon { width: 38px; padding: 7px 0 }
+.btn svg { width: 16px; height: 16px; fill: currentColor }
+.note { background: var(--surface-2); border-radius: 8px; padding: 12px 14px; font-size: 16px; line-height: 1.5 }
+.note .num { font-family: var(--hand); color: var(--accent); font-size: 18px; margin-right: 6px }
+.role { border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; font-size: 14.5px }
+.legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; font-size: 13px; color: var(--muted) }
+.legend div { display: flex; align-items: center; gap: 8px }
+.legend svg { width: 40px; height: 14px; flex: none }
+.cards { display: flex; flex-direction: column; gap: 10px }
+.card { border: 1px solid var(--line); border-radius: 9px; padding: 12px; display: flex; flex-direction: column; gap: 8px }
+.card h3 { font-size: 19px; text-transform: uppercase }
+.card p { color: var(--muted); font-size: 14px }
+.result { border-radius: 8px; padding: 10px 12px; font-weight: 600; font-size: 15px }
+.result.good { background: color-mix(in srgb, var(--good) 15%, transparent); color: var(--good) }
+.result.ok { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn) }
+.result.bad { background: color-mix(in srgb, var(--bad) 13%, transparent); color: var(--bad) }
+.score { font-family: var(--display); font-size: 54px; font-weight: 700; line-height: 1 }
+.choices { display: flex; flex-direction: column; gap: 6px }
+.choices .btn { justify-content: flex-start; text-align: left }
+.choices .btn.right { border-color: var(--good); color: var(--good) }
+.choices .btn.wrong { border-color: var(--bad); color: var(--bad) }
+.pchips { display: flex; gap: 6px; flex-wrap: wrap }
+.pchips button { border: 1.5px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 4px 12px; font-family: var(--hand); font-size: 15px }
+.pchips button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink) }
+.toggles { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 14px }
+.toggles label { display: inline-flex; gap: 4px; align-items: center; font-family: var(--hand) }
+.moves { display: flex; flex-direction: column; gap: 6px }
+.moves .mv { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center }
+.moves .who { font-family: var(--hand); font-size: 17px; text-align: center }
+.hint { font-size: 13px; color: var(--muted) }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.sep { border: 0; border-top: 1px solid var(--line); margin: 0 }
+.gifbox { display: flex; flex-direction: column; gap: 8px }
+.gifbox img { border: 1px solid var(--line); border-radius: 8px; background: var(--court) }
+.trace-ctl { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13.5px }
+.trace-ctl input[type=range] { flex: 1; min-width: 100px }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 8px; font-size: 14px; z-index: 20; max-width: calc(100% - 32px) }
+footer { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); display: flex; gap: 8px 18px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted) }
+footer button { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline }
+
+/* court */
+.c-apron { fill: var(--apron) }
+.c-floor { fill: var(--court) }
+.c-paint { fill: var(--paint) }
+.c-line, .c-board { fill: none; stroke: var(--court-line); stroke-width: .16 }
+.c-board { stroke-width: .3 }
+.c-dash { fill: none; stroke: var(--court-line); stroke-width: .16; stroke-dasharray: .8 .6 }
+.c-rim { fill: none; stroke: var(--ball); stroke-width: .22 }
+.c-label { font-family: var(--body); font-size: 1.1px; fill: var(--court-line); letter-spacing: .1px; text-transform: uppercase }
+.p-o { stroke: var(--off) } .p-d { stroke: var(--def) } .p-b { stroke: var(--ball) }
+.path { fill: none; stroke-width: .28; stroke-linecap: round; stroke-linejoin: round }
+.path.pass { stroke-dasharray: .9 .7 }
+.paths.faint { opacity: .4 }
+.tok .hit { fill: transparent }
+.tok .ring { fill: none; stroke: var(--accent); stroke-width: .35; opacity: 0 }
+.tok.me .ring { opacity: 1 }
+.tok.drag { cursor: grab }
+.tok.o .body { fill: var(--court); stroke: var(--off); stroke-width: .3 }
+.tok.o text { fill: var(--off); font-family: var(--hand); font-size: 2.2px; text-anchor: middle }
+.tok.d .xbg { fill: var(--court); opacity: .85 }
+.tok.d .x { stroke: var(--def); stroke-width: .42; stroke-linecap: round }
+.tok.d text { fill: var(--def); font-family: var(--hand); font-size: 1.6px }
+#ballg .b { fill: var(--ball) }
+#ballg .seam { fill: none; stroke: var(--court); stroke-width: .12 }
+.ghost { fill: none; stroke: var(--accent); stroke-width: .25; stroke-dasharray: .5 .4 }
+.miss { stroke: var(--accent); stroke-width: .18; stroke-dasharray: .4 .4 }
+
+@media (max-width: 1080px) { .work { grid-template-columns: minmax(0, 1fr) } }
+@media (max-width: 760px) {
+  .app { grid-template-columns: minmax(0, 1fr) }
+  .lib { position: static; max-height: 300px }
+  .brand h1 { font-size: 26px }
+  .tabs button { font-size: 16px; padding: 8px 10px }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><h1>Chalk <span>Talk</span></h1><small>Learn the plays before the whistle</small></div>
+  <div class="spacer"></div>
+  <span class="chip coach" id="coachChip" hidden>Coach tools on</span>
+  <span class="chip" id="progChip">Studied <b>0</b></span>
+</header>
+
+<div class="app">
+  <aside class="lib" aria-label="Playbook">
+    <div class="lib-head">
+      <div class="row"><h2>Playbook</h2><button class="btn" id="newBtn" hidden>New play</button></div>
+      <div id="unpub"></div>
+      <div class="seg" role="group" aria-label="Filter plays">
+        <button data-filter="all" aria-pressed="true">All</button>
+        <button data-filter="offense" aria-pressed="false">Offense</button>
+        <button data-filter="defense" aria-pressed="false">Defense</button>
+      </div>
+      <input class="search" id="q" type="search" placeholder="Search plays" aria-label="Search plays">
+    </div>
+    <div class="list" id="list"><div class="empty">Loading the playbook…</div></div>
+  </aside>
+
+  <main class="stage">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-mode="study" aria-selected="true">Study</button>
+      <button role="tab" data-mode="quiz" aria-selected="false">Quiz</button>
+      <button role="tab" data-mode="edit" aria-selected="false" class="coach-only" hidden>Edit</button>
+      <button role="tab" data-mode="import" aria-selected="false" class="coach-only" hidden>Import</button>
+    </div>
+    <div class="work">
+      <div class="board-wrap">
+        <svg id="board" viewBox="-2 -4 54 53" role="img" aria-label="Half court diagram">
+          <defs>
+            <marker id="m-o" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--off)"/></marker>
+            <marker id="m-d" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--def)"/></marker>
+            <marker id="m-b" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ball)"/></marker>
+          </defs>
+          <g id="court"></g>
+          <g id="traceg" hidden><image id="trace" x="0" y="0" width="50" height="47" preserveAspectRatio="xMidYMid meet"/></g>
+          <g id="courtlines"></g>
+          <g id="paths" class="paths"></g>
+          <g id="ghosts"></g>
+          <g id="toks"></g>
+          <g id="ballg" hidden><circle class="b" r=".85"/><path class="seam" d="M-.85 0 H.85 M0 -.85 V.85"/></g>
+        </svg>
+        <div class="board-cap"><span>Half court · basket at top</span><span id="capR"></span></div>
+      </div>
+      <section class="panel" id="panel" aria-live="polite"></section>
+    </div>
+  </main>
+</div>
+<footer>
+  <span>On your phone, open this page and choose <b>Add to Home Screen</b> to keep it like an app.</span>
+  <span class="spacer"></span>
+  <button id="coachToggle">Turn on coach tools</button>
+</footer>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- example plays: used only when plays.json can't be loaded ---------- */
+const STARTER = [
+  { id: "ex-horns", example: true, name: "Horns Elbow Entry", side: "offense", category: "Half-court set",
+    summary: "Bigs at both elbows, shooters in the corners. Enter to the elbow, then flow into a hand-off and a downhill drive.",
+    start: { "1": [25, 32], "2": [3, 3], "3": [47, 3], "4": [19, 19], "5": [31, 19] }, ball: "1",
+    roles: { "1": "Make the entry pass on time, then space out to the right wing.", "2": "Stay in the corner until 1 passes. Lift to the wing and come hard off the hand-off.", "3": "Stay wide in the right corner and be ready for the kick-out.", "4": "Catch, face up and look for 5 first. Then dribble into the hand-off and roll.", "5": "Roll hard to the rim after the entry. Clear to the short corner when 2 drives." },
+    steps: [
+      { note: "1 passes to 4 at the left elbow. 5 rolls hard to the rim.", pass: "4", moves: { "5": { to: [28, 6], kind: "cut" } } },
+      { note: "1 cuts away to the right wing. 2 lifts from the corner to the left wing.", moves: { "1": { to: [41, 23], kind: "cut" }, "2": { to: [8, 21], kind: "cut" } } },
+      { note: "4 dribbles at 2 and hands it off. 2 takes it toward the middle.", pass: "2", moves: { "4": { to: [12, 22], kind: "dribble" }, "2": { to: [15, 27], kind: "cut" } } },
+      { note: "2 attacks the lane. 4 seals and rolls to the block. 5 clears to the short corner.", moves: { "2": { to: [21, 13], kind: "dribble" }, "4": { to: [19, 6], kind: "cut" }, "5": { to: [40, 6], kind: "cut" } } }
+    ] },
+  { id: "ex-spread-pnr", example: true, name: "Spread Pick and Roll", side: "offense", category: "Ball screen",
+    summary: "Four out, one in. A high ball screen with room for the roller and shooters spotted up.",
+    start: { "1": [25, 33], "2": [8, 22], "3": [47, 3], "4": [3, 3], "5": [31, 7] }, ball: "1",
+    roles: { "1": "Wait for the screen. Come off it tight, shoulder to hip, and read the roller.", "2": "Lift to the top as the safety when 1 comes off the screen.", "3": "Stay in the right corner. If your defender helps on the roll, you're open.", "4": "Stay in the left corner and keep your defender far from the paint.", "5": "Sprint up, set a solid screen on the right side of 1's defender, then roll to the rim." },
+    steps: [
+      { note: "5 sprints up and sets a ball screen on the right side of 1's defender.", moves: { "5": { to: [28, 30], kind: "screen" } } },
+      { note: "1 uses the screen going right. 5 rolls to the rim. 2 lifts to the top as the safety.", moves: { "1": { to: [34, 24], kind: "dribble" }, "5": { to: [25, 10], kind: "cut" }, "2": { to: [16, 30], kind: "cut" } } },
+      { note: "1 hits 5 on the roll for a layup. If the roll is covered, kick to 3 in the corner.", pass: "5", moves: { "5": { to: [25, 6], kind: "cut" } } }
+    ] },
+  { id: "ex-box-blob", example: true, name: "Box Back Screen", side: "offense", category: "Inbound (baseline)",
+    summary: "Baseline out of bounds from a box set. A decoy cut clears the left side, then a back screen frees 1 at the rim.",
+    start: { "3": [33, -2], "1": [31, 17], "2": [19, 17], "4": [31, 7], "5": [19, 7] }, ball: "3",
+    roles: { "1": "Wait for 4 to screen, then cut off the screen straight to the front of the rim.", "2": "Sprint to the left corner. Your cut pulls a defender away.", "3": "Slap the ball to start it. Look for 1 first, then 5 at the elbow.", "4": "Step up and back-screen 1's defender. Hold it until 1 is past you.", "5": "Pop to the left elbow as the safety outlet." },
+    steps: [
+      { note: "2 cuts hard to the left corner as a decoy. 4 steps up and back-screens for 1.", moves: { "2": { to: [4, 4], kind: "cut" }, "4": { to: [30, 12], kind: "screen" } } },
+      { note: "1 cuts off the screen to the front of the rim. 5 pops to the left elbow as the safety.", moves: { "1": { to: [27, 3.5], kind: "cut" }, "5": { to: [19, 21], kind: "cut" } } },
+      { note: "3 passes to 1 for the layup. If it's covered, throw to 5 at the elbow.", pass: "1", moves: {} }
+    ] },
+  { id: "ex-zone-23", example: true, name: "2-3 Zone Slides", side: "defense", category: "Zone",
+    summary: "Where each defender goes as the ball moves from the top, to the wing, to the corner and on a skip pass.",
+    start: { "1": [25, 31], "2": [41, 22], "3": [9, 22], "4": [25, 19], "5": [46, 4], "X1": [20, 25], "X2": [30, 25], "X3": [13, 9], "X4": [37, 9], "X5": [25, 7] }, ball: "1",
+    roles: { "X1": "Top left. You drop to the high post when the ball goes right and close out when it comes back to your side.", "X2": "Top right. Close out on the right wing. When the ball goes to the corner, drop to the elbow.", "X3": "Back left. Slide to the middle of the lane when the ball is on the right side.", "X4": "Back right. Slide out to the corner and close out when the ball gets there.", "X5": "Middle. Always be on the ball side of the block. Front the post when the ball is in the corner." },
+    steps: [
+      { note: "Ball to the right wing. X2 closes out on the ball. X1 drops to the high post. X4 slides toward the corner, X5 to the ball-side block, X3 to the middle of the lane.", pass: "2", moves: { "X2": { to: [37, 22], kind: "cut" }, "X1": { to: [26, 22], kind: "cut" }, "X4": { to: [42, 11], kind: "cut" }, "X5": { to: [31, 7], kind: "cut" }, "X3": { to: [22, 8], kind: "cut" } } },
+      { note: "Ball to the corner. X4 closes out. X5 fronts the block. X2 drops to the elbow, X1 takes the high post, X3 protects the rim.", pass: "5", moves: { "X4": { to: [43, 7], kind: "cut" }, "X5": { to: [34, 5], kind: "cut" }, "X2": { to: [36, 15], kind: "cut" }, "X1": { to: [27, 20], kind: "cut" }, "X3": { to: [24, 6], kind: "cut" } } },
+      { note: "Skip pass to the left wing. Everyone sprints: X1 closes out, X3 gets back to the left block, X5 to the middle, X4 to the right block, X2 to the high post.", pass: "3", moves: { "X1": { to: [12, 23], kind: "cut" }, "X3": { to: [13, 10], kind: "cut" }, "X5": { to: [20, 7], kind: "cut" }, "X4": { to: [31, 8], kind: "cut" }, "X2": { to: [24, 22], kind: "cut" } } }
+    ] },
+  { id: "ex-hedge", example: true, name: "Ball Screen Hedge", side: "defense", category: "Man-to-man coverage",
+    summary: "How we guard a high ball screen: talk early, hedge to stop the ball, tag the roller, then recover.",
+    start: { "1": [25, 33], "2": [8, 22], "3": [47, 3], "4": [3, 3], "5": [31, 7], "X1": [25, 29], "X2": [11, 19], "X3": [43, 6], "X4": [7, 7], "X5": [29, 10] }, ball: "1",
+    roles: { "X1": "Hear the call, then fight over the top of the screen. Recover to the ball fast.", "X2": "Stay in the gap between your player and the ball.", "X3": "Stay home in the corner. Don't leave a shooter.", "X4": "You're the low helper. Tag the roller, then get back to the corner.", "X5": "Call 'Screen right!' early. Jump out to stop the ball, then sprint back to the roller." },
+    steps: [
+      { note: "5 comes up to set the ball screen. X5 calls \"Screen right!\" and follows one step behind.", moves: { "5": { to: [28, 30], kind: "screen" }, "X5": { to: [30, 27], kind: "cut" } } },
+      { note: "1 turns the corner. X5 jumps out to stop the ball (hedge). X1 fights over the top. X4 leaves the corner to tag the roller.", moves: { "1": { to: [34, 25], kind: "dribble" }, "5": { to: [26, 16], kind: "cut" }, "X5": { to: [36, 22], kind: "cut" }, "X1": { to: [32, 28], kind: "cut" }, "X4": { to: [23, 13], kind: "cut" } } },
+      { note: "X1 recovers to the ball. X5 sprints back to the roller. X4 returns to the corner.", moves: { "5": { to: [25, 10], kind: "cut" }, "X1": { to: [32, 22], kind: "cut" }, "X5": { to: [26, 12.5], kind: "cut" }, "X4": { to: [7, 7], kind: "cut" } } }
+    ] }
+];
+
+/* ---------- constants and helpers ---------- */
+const OFF_IDS = ["1", "2", "3", "4", "5"], DEF_IDS = ["X1", "X2", "X3", "X4", "X5"];
+const DEFAULT_SPOT = { "1": [25, 32], "2": [41, 22], "3": [9, 22], "4": [19, 8], "5": [31, 8], "X1": [25, 28], "X2": [37, 19], "X3": [13, 19], "X4": [21, 11], "X5": [29, 11] };
+const KIND_LABEL = { cut: "Cut", dribble: "Dribble", screen: "Screen" };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const team = id => id.startsWith("X") ? "d" : "o";
+const newId = () => "p-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const slug = s => (s || "play").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "play";
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("chalktalk." + k); return v == null ? d : JSON.parse(v) } catch { return d } },
+  set(k, v) { try { localStorage.setItem("chalktalk." + k, JSON.stringify(v)) } catch {} },
+  del(k) { try { localStorage.removeItem("chalktalk." + k) } catch {} }
+};
+const ICON = {
+  restart: '<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>',
+  prev: '<svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 18V6z"/></svg>',
+  next: '<svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>',
+  play: '<svg viewBox="0 0 24 24"><path d="M7 5v14l11-7z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>'
+};
+
+/* ---------- state ---------- */
+const S = {
+  plays: [], sitePlays: [], loaded: false, siteMissing: false, localDirty: false,
+  coach: store.get("coach", false) || location.hash === "#coach",
+  sel: store.get("sel", null), filter: store.get("filter", "all"), q: "",
+  mode: "study", step: 0, playing: false, speed: store.get("speed", 1), timer: null, anim: null,
+  me: store.get("me", {}), progress: store.get("progress", {}), quiz: null, edit: null, drag: null,
+  trace: null, gif: null, confirmDiscard: false
+};
+
+/* ---------- play validation (imported files are untrusted) ---------- */
+function normPlay(id, raw) {
+  if (!raw || typeof raw !== "object" || !raw.start || typeof raw.start !== "object") return null;
+  const okId = k => OFF_IDS.includes(k) || DEF_IDS.includes(k);
+  const pt = v => Array.isArray(v) && v.length === 2 && v.every(n => typeof n === "number" && isFinite(n)) ? [clamp(v[0], -1, 51), clamp(v[1], -3, 48)] : null;
+  const start = {};
+  for (const [k, v] of Object.entries(raw.start)) { const p = pt(v); if (okId(k) && p) start[k] = p }
+  if (!Object.keys(start).length) return null;
+  const steps = (Array.isArray(raw.steps) ? raw.steps : []).map(s => {
+    const moves = {};
+    for (const [k, m] of Object.entries((s && s.moves) || {})) { const p = m && pt(m.to); if (start[k] && p) moves[k] = { to: p, kind: KIND_LABEL[m.kind] ? m.kind : "cut" } }
+    return { note: String((s && s.note) || ""), pass: s && start[s.pass] ? s.pass : null, moves };
+  });
+  const roles = {};
+  for (const [k, v] of Object.entries(raw.roles || {})) if (start[k] && v) roles[k] = String(v);
+  return { id, name: String(raw.name || "Untitled play"), side: raw.side === "defense" ? "defense" : "offense", category: String(raw.category || ""), summary: String(raw.summary || ""),
+    start, ball: start[raw.ball] ? raw.ball : Object.keys(start).find(k => team(k) === "o") || Object.keys(start)[0], steps, roles, example: !!raw.example };
+}
+function toDoc(p) { const d = clone(p); d.steps.forEach(s => { if (!s.pass) delete s.pass }); if (!d.example) delete d.example; return d }
+function parsePlaybook(j) {
+  const raws = Array.isArray(j) ? j : Array.isArray(j && j.plays) ? j.plays : [j];
+  return raws.map(r => normPlay(r && typeof r.id === "string" && /^[\w-]{1,60}$/.test(r.id) ? r.id : newId(), r));
+}
+
+function buildStates(play) {
+  const st = [{ pos: { ...play.start }, ball: play.ball }];
+  for (const s of play.steps) {
+    const prev = st[st.length - 1], pos = { ...prev.pos };
+    for (const [id, m] of Object.entries(s.moves || {})) if (pos[id]) pos[id] = m.to.slice();
+    st.push({ pos, ball: s.pass && pos[s.pass] ? s.pass : prev.ball });
+  }
+  return st;
+}
+function pathsFor(play, sts, i, hide) {
+  if (i < 1 || i > play.steps.length) return [];
+  const a = sts[i - 1], b = sts[i], s = play.steps[i - 1], out = [];
+  for (const [id, m] of Object.entries(s.moves || {})) if (id !== hide && a.pos[id]) out.push({ kind: m.kind, from: a.pos[id], to: b.pos[id], team: team(id) });
+  if (s.pass && s.pass !== a.ball && a.pos[a.ball] && hide !== a.ball && hide !== s.pass) out.push({ kind: "pass", from: a.pos[a.ball], to: b.pos[s.pass], team: "b" });
+  return out;
+}
+const sideIds = play => Object.keys(play.start).filter(k => play.side === "defense" ? team(k) === "d" : team(k) === "o");
+const curPlay = () => S.plays.find(p => p.id === S.sel) || null;
+const tokOrder = play => Object.keys(play.start).sort((x, y) => team(y).localeCompare(team(x)));
+const ballOff = p => [p[0] + 1.35, p[1] - 1.35];
+/* positions and ball spot partway (t from 0 to 1) through step i */
+function frameAt(play, sts, i, t) {
+  const a = sts[i - 1], b = sts[i], s = play.steps[i - 1], e = ease(t), pos = {};
+  for (const id in a.pos) pos[id] = lerp(a.pos[id], b.pos[id] || a.pos[id], e);
+  const recv = s.pass && s.pass !== a.ball ? s.pass : null;
+  let bp = pos[a.ball] ? ballOff(pos[a.ball]) : null;
+  if (recv && pos[recv]) { const k = clamp((t - .35) / .55, 0, 1); if (k > 0) bp = lerp(bp || ballOff(pos[recv]), ballOff(pos[recv]), ease(k)) }
+  return { pos, bp };
+}
+
+/* ---------- court and diagram geometry (shared by the SVG board and GIF export) ---------- */
+function courtShapes() {
+  const r = 23.75, cy = 5.25, y3 = (cy + Math.sqrt(r * r - 22 * 22)).toFixed(2);
+  return [
+    { k: "floor", d: "M0 0 H50 V47 H0 Z", fill: 1 }, { k: "paint", d: "M17 0 H33 V19 H17 Z", fill: 1 },
+    { k: "line", d: "M0 0 H50 V47 H0 Z" }, { k: "line", d: "M17 0 H33 V19 H17 Z" },
+    ...[7, 8, 11, 14].map(y => ({ k: "line", d: `M17 ${y} h-.7 M33 ${y} h.7` })),
+    { k: "line", d: "M19 19 A6 6 0 0 0 31 19" }, { k: "dash", d: "M19 19 A6 6 0 0 1 31 19" },
+    { k: "line", d: `M3 0 V${y3} A${r} ${r} 0 0 0 47 ${y3} V0` },
+    { k: "line", d: "M21 4 V5.25 A4 4 0 0 0 29 5.25 V4" }, { k: "board", d: "M22 4 H28" },
+    { k: "rim", d: "M25.75 5.25 A.75 .75 0 1 0 24.25 5.25 A.75 .75 0 1 0 25.75 5.25" },
+    { k: "line", d: "M19 47 A6 6 0 0 1 31 47" }
+  ];
+}
+const COURT = courtShapes();
+$("#court").innerHTML = `<rect class="c-apron" x="-2" y="-4" width="54" height="53"/>` + COURT.filter(c => c.fill).map(c => `<path class="c-${c.k}" d="${c.d}"/>`).join("");
+$("#courtlines").innerHTML = COURT.filter(c => !c.fill).map(c => `<path class="c-${c.k}" d="${c.d}"/>`).join("") +
+  `<text class="c-label" x="25" y="-1.2" text-anchor="middle">Baseline</text><text class="c-label" x="25" y="48.4" text-anchor="middle">Half-court line</text>`;
+
+function pathGeom(p) {
+  const L = dist(p.from, p.to); if (L < .8) return null;
+  const u = [(p.to[0] - p.from[0]) / L, (p.to[1] - p.from[1]) / L], n = [-u[1], u[0]];
+  const s0 = Math.min(2, L * .3), e0 = p.kind === "screen" ? 2.1 : 2.3;
+  if (L - s0 - e0 < .5) return null;
+  const a = [p.from[0] + u[0] * s0, p.from[1] + u[1] * s0], b = [p.to[0] - u[0] * e0, p.to[1] - u[1] * e0];
+  if (p.kind === "screen") { const h = 1.3; return { pts: [a, b], bar: [[b[0] + n[0] * h, b[1] + n[1] * h], [b[0] - n[0] * h, b[1] - n[1] * h]], arrow: false, u } }
+  if (p.kind === "dribble") {
+    const len = dist(a, b), zig = Math.max(0, len - 1.4), wl = 1.3, amp = .55, pts = [a];
+    for (let d = wl / 2, k = 0; d < zig; d += wl / 2, k++) { const s = k % 2 ? -amp : amp; pts.push([a[0] + u[0] * d + n[0] * s, a[1] + u[1] * d + n[1] * s]) }
+    pts.push([a[0] + u[0] * zig, a[1] + u[1] * zig], b);
+    return { pts, arrow: true, u };
+  }
+  return { pts: [a, b], arrow: true, dash: p.kind === "pass", u };
+}
+function pathMarkup(p) {
+  const g = pathGeom(p); if (!g) return "";
+  const f = v => v.toFixed(2), cls = `path p-${p.team} ${p.kind}`;
+  let s = `<polyline class="${cls}" ${g.arrow ? `marker-end="url(#m-${p.team})"` : ""} points="${g.pts.map(q => f(q[0]) + "," + f(q[1])).join(" ")}"/>`;
+  if (g.bar) s += `<line class="${cls}" style="stroke-width:.4" x1="${f(g.bar[0][0])}" y1="${f(g.bar[0][1])}" x2="${f(g.bar[1][0])}" y2="${f(g.bar[1][1])}"/>`;
+  return s;
+}
+function tokMarkup(id) {
+  if (team(id) === "o") return `<g class="tok o" data-id="${id}"><circle class="hit" r="2.6"/><circle class="ring" r="2.4"/><circle class="body" r="1.7"/><text y=".75">${id}</text></g>`;
+  return `<g class="tok d" data-id="${id}"><circle class="hit" r="2.6"/><circle class="ring" r="2.4"/><circle class="xbg" r="1.5"/><path class="x" d="M-1.15 -1.15 L1.15 1.15 M1.15 -1.15 L-1.15 1.15"/><text x="1.2" y="2.15">${id.slice(1)}</text></g>`;
+}
+
+/* scene: draw tokens, paths, ghosts for a play. o = {pos, ball, paths, me, drag, ghosts, faint} */
+let tokEls = {};
+function scene(play, o) {
+  $("#toks").innerHTML = tokOrder(play).map(tokMarkup).join("");
+  tokEls = {};
+  document.querySelectorAll("#toks .tok").forEach(g => {
+    const id = g.dataset.id; tokEls[id] = g;
+    g.classList.toggle("me", id === o.me);
+    g.classList.toggle("drag", !!(o.drag && o.drag.ids.has(id)));
+  });
+  $("#paths").innerHTML = (o.paths || []).map(pathMarkup).join("");
+  $("#paths").classList.toggle("faint", !!o.faint);
+  $("#ghosts").innerHTML = o.ghosts || "";
+  S.drag = o.drag || null;
+  S.ballHolder = o.ball;
+  place(o.pos, o.ball && o.pos[o.ball] ? ballOff(o.pos[o.ball]) : null);
+}
+function place(pos, bp) {
+  for (const [id, g] of Object.entries(tokEls)) if (pos[id]) g.setAttribute("transform", `translate(${pos[id][0].toFixed(2)} ${pos[id][1].toFixed(2)})`);
+  const bg = $("#ballg");
+  bg.toggleAttribute("hidden", !bp);
+  if (bp) bg.setAttribute("transform", `translate(${bp[0].toFixed(2)} ${bp[1].toFixed(2)})`);
+}
+function stopAnim() { if (S.anim) { S.anim(); S.anim = null } clearTimeout(S.timer) }
+function animateStep(play, sts, i, done) {
+  stopAnim();
+  const dur = reduced ? 0 : 1300 / S.speed, t0 = performance.now();
+  let raf = 0, live = true;
+  const frame = now => {
+    if (!live) return;
+    const t = dur ? Math.min(1, (now - t0) / dur) : 1, f = frameAt(play, sts, i, t);
+    place(f.pos, f.bp);
+    if (t < 1) raf = requestAnimationFrame(frame); else { S.anim = null; $("#paths").classList.remove("faint"); done && done() }
+  };
+  $("#paths").classList.add("faint");
+  raf = requestAnimationFrame(frame);
+  S.anim = () => { live = false; cancelAnimationFrame(raf) };
+}
+
+/* dragging */
+const svg = $("#board");
+function svgPt(e) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const r = p.matrixTransform(svg.getScreenCTM().inverse()); return [clamp(r.x, -1, 51), clamp(r.y, -3, 48)] }
+let dragging = null;
+svg.addEventListener("pointerdown", e => {
+  const g = e.target.closest(".tok"); if (!g || !S.drag || !S.drag.ids.has(g.dataset.id)) return;
+  e.preventDefault(); stopAnim(); dragging = g.dataset.id; svg.setPointerCapture(e.pointerId);
+});
+svg.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  const p = svgPt(e); tokEls[dragging].setAttribute("transform", `translate(${p[0].toFixed(2)} ${p[1].toFixed(2)})`);
+  if (S.ballHolder === dragging) place({}, ballOff(p));
+});
+svg.addEventListener("pointerup", e => {
+  if (!dragging) return;
+  const id = dragging, p = svgPt(e).map(v => Math.round(v * 2) / 2); dragging = null;
+  S.drag && S.drag.onDrop(id, p);
+});
+svg.addEventListener("pointercancel", () => { dragging = null });
+
+/* ---------- tracing a diagram ---------- */
+function showTrace() {
+  const on = !!(S.trace && S.mode === "edit" && S.edit);
+  $("#traceg").toggleAttribute("hidden", !on);
+  if (!on) return;
+  const img = $("#trace");
+  img.setAttribute("href", S.trace.url);
+  img.setAttribute("opacity", S.trace.opacity);
+  img.setAttribute("transform", S.trace.flip ? "translate(0 47) scale(1 -1)" : "");
+}
+function loadTrace(file) {
+  if (!file || !file.type.startsWith("image/")) { toast("That file isn't an image. Try a PNG or JPG."); return }
+  const r = new FileReader();
+  r.onload = () => {
+    S.trace = { url: r.result, opacity: .5, flip: false };
+    if (!S.edit) openEditor(null); else renderEdit();
+    showTrace();
+    toast("Diagram loaded. Drag players on top of it.");
+  };
+  r.readAsDataURL(file);
+}
+
+/* ---------- progress (kept on this device) ---------- */
+function prog(id) { return S.progress[id] || (S.progress[id] = {}) }
+function saveProgress() { store.set("progress", S.progress); renderHeader(); renderList() }
+
+/* ---------- local playbook changes (coach) ---------- */
+function commitLocal(plays) {
+  S.plays = plays; sortPlays();
+  store.set("localPlaybook", S.plays.map(toDoc)); S.localDirty = true;
+  renderHeader(); renderList();
+}
+function discardLocal() {
+  store.del("localPlaybook"); S.localDirty = false; S.confirmDiscard = false;
+  S.plays = clone(S.sitePlays); sortPlays();
+  if (!curPlay()) S.sel = S.plays[0]?.id || null;
+  toast("Back to the published playbook."); renderHeader(); renderList(); setMode("study");
+}
+function exportPlaybook() {
+  const data = { app: "chalk-talk", version: 1, exportedAt: new Date().toISOString(), plays: S.plays.map(toDoc) };
+  downloadBlob(new Blob([JSON.stringify(data, null, 1)], { type: "application/json" }), "plays.json");
+}
+function downloadBlob(blob, name) {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+}
+
+/* ---------- header and library ---------- */
+function renderHeader() {
+  const n = S.plays.filter(p => S.progress[p.id]?.studied).length;
+  $("#progChip").innerHTML = `Studied <b>${n} of ${S.plays.length}</b>`;
+  $("#coachChip").hidden = !S.coach;
+  $("#newBtn").hidden = !S.coach;
+  document.querySelectorAll(".coach-only").forEach(b => b.hidden = !S.coach);
+  $("#coachToggle").textContent = S.coach ? "Turn off coach tools" : "Turn on coach tools";
+  $("#unpub").innerHTML = S.coach && S.localDirty ? `<div class="unpub"><span><b>Not published yet.</b> Your changes are only on this device. Download plays.json and upload it to the site to share them.</span>
+    <div class="controls"><button class="btn primary" data-act="export">Download plays.json</button>${S.confirmDiscard ? `<button class="btn danger solid" data-act="discardyes">Yes, discard</button>` : `<button class="btn danger" data-act="discard">Discard</button>`}</div></div>` : "";
+}
+function renderList() {
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.filter === S.filter)));
+  const q = S.q.trim().toLowerCase();
+  const items = S.plays.filter(p => (S.filter === "all" || p.side === S.filter) && (!q || (p.name + " " + p.category).toLowerCase().includes(q)));
+  const el = $("#list");
+  if (!S.loaded) { el.innerHTML = `<div class="empty">Loading the playbook…</div>`; return }
+  if (!S.plays.length) {
+    el.innerHTML = S.coach
+      ? `<div class="empty"><p>The playbook is empty. Draw a play or import one.</p><button class="btn primary" data-act="new">Draw a play</button><button class="btn" data-mode="import">Import plays</button></div>`
+      : `<div class="empty">Your coach hasn't added any plays yet. Check back soon.</div>`;
+    return;
+  }
+  if (!items.length) { el.innerHTML = `<div class="empty">No plays match.</div>`; return }
+  el.innerHTML = items.map(p => {
+    const pr = S.progress[p.id] || {};
+    const st = [pr.studied ? `<span class="done">✓ Studied</span>` : "", pr.best != null ? `<span>Quiz best ${pr.best}%</span>` : ""].filter(Boolean).join("");
+    return `<button class="item" data-play="${esc(p.id)}" aria-current="${p.id === S.sel}"><span class="nm">${esc(p.name)}</span><span class="side ${p.side[0]}">${p.side === "defense" ? "D" : "O"}</span>
+      <span class="meta"><span>${esc(p.category || (p.side === "defense" ? "Defense" : "Offense"))} · ${p.steps.length} step${p.steps.length === 1 ? "" : "s"}</span>${p.example ? `<span class="tag-ex">Example</span>` : ""}${st}</span></button>`;
+  }).join("");
+}
+
+/* ---------- mode routing ---------- */
+function setMode(m) {
+  stopAnim(); S.playing = false; S.gif = null;
+  if (m !== "quiz") S.quiz = null;
+  if (m !== "edit") S.edit = null;
+  S.mode = m;
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === m)));
+  renderStage();
+}
+function renderStage() {
+  if (S.mode === "edit") renderEdit();
+  else if (S.mode === "import") renderImport();
+  else if (S.mode === "quiz") renderQuiz();
+  else renderStudy();
+  showTrace();
+}
+function emptyStage(msg) {
+  $("#toks").innerHTML = ""; $("#paths").innerHTML = ""; $("#ghosts").innerHTML = ""; $("#ballg").toggleAttribute("hidden", true); S.drag = null;
+  $("#capR").textContent = "";
+  $("#panel").innerHTML = `<p class="hint">${msg}</p>`;
+}
+const legend = () => `<div class="legend" aria-label="Diagram key">
+  <div><svg viewBox="0 0 40 14"><line x1="2" y1="7" x2="32" y2="7" stroke="var(--off)" stroke-width="2"/><path d="M30 2 L38 7 L30 12z" fill="var(--off)"/></svg>Cut</div>
+  <div><svg viewBox="0 0 40 14"><polyline points="2,7 6,3 10,11 14,3 18,11 22,3 26,7 32,7" fill="none" stroke="var(--off)" stroke-width="2"/><path d="M30 2 L38 7 L30 12z" fill="var(--off)"/></svg>Dribble</div>
+  <div><svg viewBox="0 0 40 14"><line x1="2" y1="7" x2="32" y2="7" stroke="var(--ball)" stroke-width="2" stroke-dasharray="5 4"/><path d="M30 2 L38 7 L30 12z" fill="var(--ball)"/></svg>Pass</div>
+  <div><svg viewBox="0 0 40 14"><line x1="2" y1="7" x2="34" y2="7" stroke="var(--off)" stroke-width="2"/><line x1="34" y1="1" x2="34" y2="13" stroke="var(--off)" stroke-width="3"/></svg>Screen</div>
+</div>`;
+function myPosSelect(play, id, allowNone) {
+  const ids = Object.keys(play.start).sort((a, b) => sideIds(play).includes(b) - sideIds(play).includes(a));
+  const cur = S.me[play.id] || (allowNone ? "" : sideIds(play)[0]);
+  return `<select class="inline" id="${id}">${allowNone ? `<option value="">Nobody (whole play)</option>` : ""}${ids.map(k => `<option value="${k}" ${k === cur ? "selected" : ""}>${team(k) === "d" ? "Defender " : "Player "}${k}</option>`).join("")}</select>`;
+}
+
+/* ---------- study ---------- */
+function renderStudy() {
+  const play = curPlay();
+  if (!play) return emptyStage(S.plays.length ? "Pick a play from the playbook." : "Plays show up here once your coach adds them.");
+  const sts = buildStates(play), N = play.steps.length;
+  S.step = clamp(S.step, 0, N);
+  const me = S.me[play.id] || "";
+  scene(play, { pos: sts[S.step].pos, ball: sts[S.step].ball, paths: pathsFor(play, sts, S.step), me });
+  renderStudyPanel(play);
+}
+function gifSection(play) {
+  const g = S.gif && S.gif.playId === play.id ? S.gif : null;
+  if (!g) return `<div class="controls"><button class="btn" data-act="gif" ${play.steps.length ? "" : "disabled"}>Save as GIF</button><span class="hint">An animated picture you can text or post.</span></div>`;
+  if (!g.url) return `<div class="hint">${esc(g.status)}</div>`;
+  return `<div class="gifbox"><img src="${g.url}" alt="Animated diagram of ${esc(play.name)}">
+    <div class="controls"><a class="btn primary" href="${g.url}" download="${slug(play.name)}.gif">Download GIF</a>${g.canShare ? `<button class="btn" data-act="sharegif">Share</button>` : ""}<button class="btn" data-act="closegif">Close</button></div>
+    <span class="hint">${(g.size / 1048576).toFixed(1)} MB. On iPhone, press and hold the picture to save it to Photos.</span></div>`;
+}
+function renderStudyPanel(play) {
+  const N = play.steps.length, i = S.step, me = S.me[play.id] || "";
+  $("#capR").textContent = i === 0 ? "Setup" : `Step ${i} of ${N}`;
+  const note = i === 0 ? `<span class="num">Setup</span>${esc(play.summary || "Everyone in their starting spots.")}` : `<span class="num">${i}</span>${esc(play.steps[i - 1].note || "")}`;
+  $("#panel").innerHTML = `
+    <div><div class="sub"><span class="side ${play.side[0]}">${play.side}</span>${esc(play.category)}${play.example ? `<span class="tag-ex">Example</span>` : ""}</div><h2>${esc(play.name)}</h2></div>
+    <div class="steps" role="group" aria-label="Steps">${["Set"].concat(play.steps.map((_, k) => k + 1)).map((l, k) => `<button data-step="${k}" aria-current="${k === i}" aria-label="${k ? "Step " + k : "Setup"}">${l}</button>`).join("")}</div>
+    <div class="controls">
+      <button class="btn icon" data-act="restart" aria-label="Back to setup">${ICON.restart}</button>
+      <button class="btn icon" data-act="prev" aria-label="Previous step" ${i === 0 ? "disabled" : ""}>${ICON.prev}</button>
+      <button class="btn primary" data-act="play" ${N ? "" : "disabled"}>${S.playing ? ICON.pause + "Pause" : ICON.play + (i === N && N ? "Replay" : "Play")}</button>
+      <button class="btn icon" data-act="next" aria-label="Next step" ${i >= N ? "disabled" : ""}>${ICON.next}</button>
+      <select class="inline" id="speed" aria-label="Speed" style="width:auto">${[.5, 1, 1.5].map(v => `<option value="${v}" ${v == S.speed ? "selected" : ""}>${v}×</option>`).join("")}</select>
+    </div>
+    <div class="note">${note}</div>
+    <div class="field"><label class="lbl" for="mePick">I play</label>${myPosSelect(play, "mePick", true)}</div>
+    ${me && play.roles[me] ? `<div class="role"><div class="lbl">Your job as ${me}</div>${esc(play.roles[me])}</div>` : ""}
+    <hr class="sep">${legend()}
+    <hr class="sep">${gifSection(play)}
+    <p class="hint">Tip: use ← and → to step through, space to play.</p>`;
+  if (i === N && N > 0 && !S.progress[play.id]?.studied) { prog(play.id).studied = true; saveProgress() }
+}
+function goStep(n) {
+  const play = curPlay(); if (!play) return;
+  const sts = buildStates(play), N = play.steps.length; n = clamp(n, 0, N);
+  stopAnim();
+  const me = S.me[play.id] || "";
+  if (n === S.step + 1) {
+    S.step = n;
+    scene(play, { pos: sts[n - 1].pos, ball: sts[n - 1].ball, paths: pathsFor(play, sts, n), me });
+    renderStudyPanel(play);
+    animateStep(play, sts, n, () => {
+      if (S.playing && S.step < N) S.timer = setTimeout(() => goStep(S.step + 1), 700 / S.speed);
+      else if (S.playing) { S.playing = false; renderStudyPanel(play) }
+    });
+  } else { S.step = n; S.playing = false; renderStudy() }
+}
+function togglePlay() {
+  const play = curPlay(); if (!play) return;
+  if (S.playing) { S.playing = false; stopAnim(); renderStudy(); return }
+  S.playing = true;
+  if (S.step >= play.steps.length) { S.step = 0; renderStudy(); S.playing = true; renderStudyPanel(play); S.timer = setTimeout(() => goStep(1), 500) }
+  else goStep(S.step + 1);
+}
+
+/* ---------- quiz ---------- */
+function renderQuiz() {
+  const q = S.quiz;
+  if (q && q.type === "where") return renderWhere();
+  if (q && q.type === "name") return renderName();
+  const play = curPlay();
+  if (play) { const sts = buildStates(play); scene(play, { pos: sts[0].pos, ball: sts[0].ball, paths: [], me: S.me[play.id] || sideIds(play)[0] }) }
+  else emptyStage("");
+  $("#capR").textContent = "";
+  const canName = S.plays.length >= 2;
+  $("#panel").innerHTML = `<h2>Quiz yourself</h2>
+    <div class="cards">
+      <div class="card"><h3>Where do I go?</h3>
+        ${play ? `<p>Step through <b>${esc(play.name)}</b> as one player. Drag yourself to your spot on each step, then check it.</p>
+        <div class="field"><label class="lbl" for="quizMe">My position</label>${myPosSelect(play, "quizMe", false)}</div>
+        <button class="btn primary" data-act="where" ${play.steps.length ? "" : "disabled"}>Start</button>` : `<p>Pick a play from the playbook first.</p>`}
+      </div>
+      <div class="card"><h3>Name that play</h3><p>Watch a play run with no name on it and pick which one it is. Uses the whole playbook.</p>
+        <button class="btn" data-act="namequiz" ${canName ? "" : "disabled"}>Start</button>${canName ? "" : `<p class="hint">Needs at least two plays.</p>`}
+      </div>
+    </div>`;
+}
+function startWhere() {
+  const play = curPlay(); if (!play || !play.steps.length) return;
+  const sel = $("#quizMe"), me = (sel && sel.value) || S.me[play.id] || sideIds(play)[0];
+  S.me[play.id] = me; store.set("me", S.me);
+  S.quiz = { type: "where", playId: play.id, me, i: 1, guess: null, pass: null, phase: "ask", pts: 0, max: 0 };
+  renderWhere();
+}
+function renderWhere() {
+  const q = S.quiz, play = S.plays.find(p => p.id === q.playId);
+  if (!play) { S.quiz = null; return renderQuiz() }
+  const sts = buildStates(play), N = play.steps.length, a = sts[q.i - 1], b = sts[q.i], s = play.steps[q.i - 1];
+  const holder = a.ball === q.me;
+  $("#capR").textContent = q.phase === "done" ? "Finished" : `Step ${q.i} of ${N}`;
+  if (q.phase === "ask") {
+    const pos = { ...a.pos }; if (q.guess) pos[q.me] = q.guess;
+    scene(play, { pos, ball: a.ball, paths: pathsFor(play, sts, q.i, q.me), me: q.me,
+      drag: { ids: new Set([q.me]), onDrop: (id, p) => { q.guess = p; renderWhere() } } });
+    const mates = Object.keys(play.start).filter(k => team(k) === team(q.me) && k !== q.me);
+    $("#panel").innerHTML = `<div><div class="sub">Where do I go? · Playing <b>${q.me}</b></div><h2>${esc(play.name)}</h2></div>
+      <div class="note"><span class="num">${q.i}</span>The other players' moves are drawn. Drag your highlighted ${team(q.me) === "d" ? "X" : "circle"} to where you end up on this step. If you stay put, leave it.</div>
+      ${holder ? `<div class="field"><span class="lbl">You have the ball. Pass to?</span><div class="pchips">${mates.map(k => `<button data-pass="${k}" aria-pressed="${q.pass === k}">${k}</button>`).join("")}<button data-pass="none" aria-pressed="${q.pass === "none"}" style="font-family:var(--body);font-size:13px">Keep it</button></div></div>` : ""}
+      <div class="controls"><button class="btn primary" data-act="lock" ${holder && !q.pass ? "disabled" : ""}>Check my spot</button><button class="btn" data-act="quitquiz">Stop</button></div>
+      <p class="hint">Score so far: ${fmt(q.pts)} of ${q.max}</p>`;
+    return;
+  }
+  if (q.phase === "reveal") {
+    const r = q.last;
+    const ghosts = `<circle class="ghost" cx="${r.guess[0]}" cy="${r.guess[1]}" r="1.9"/>` + (r.d > 1 ? `<line class="miss" x1="${r.guess[0]}" y1="${r.guess[1]}" x2="${b.pos[q.me][0]}" y2="${b.pos[q.me][1]}"/>` : "");
+    scene(play, { pos: a.pos, ball: a.ball, paths: pathsFor(play, sts, q.i), me: q.me, ghosts });
+    animateStep(play, sts, q.i);
+    const cls = r.movePts === 1 ? "good" : r.movePts ? "ok" : "bad";
+    const msg = r.movePts === 1 ? "Right spot." : r.movePts ? `Close. You were about ${Math.round(r.d)} feet off.` : `Not quite. You were about ${Math.round(r.d)} feet off. The dashed circle is where you went.`;
+    $("#panel").innerHTML = `<div><div class="sub">Where do I go? · Playing <b>${q.me}</b></div><h2>${esc(play.name)}</h2></div>
+      <div class="result ${cls}">${msg}${r.passQ ? `<br>${r.passOk ? "Right pass decision." : `Pass: the answer is ${r.passAns === "none" ? "keep it" : "to " + r.passAns}.`}` : ""}</div>
+      <div class="note"><span class="num">${q.i}</span>${esc(s.note)}</div>
+      ${play.roles[q.me] ? `<div class="role"><div class="lbl">Your job as ${q.me}</div>${esc(play.roles[q.me])}</div>` : ""}
+      <div class="controls"><button class="btn primary" data-act="qnext">${q.i < N ? "Next step" : "See my score"}</button><button class="btn" data-act="qreplay">Replay step</button></div>`;
+    return;
+  }
+  const pct = Math.round(q.pts / q.max * 100);
+  scene(play, { pos: sts[N].pos, ball: sts[N].ball, paths: [], me: q.me });
+  $("#panel").innerHTML = `<div><div class="sub">Where do I go? · Playing <b>${q.me}</b></div><h2>${esc(play.name)}</h2></div>
+    <div><div class="score">${pct}%</div><p class="hint">${fmt(q.pts)} of ${q.max} points${q.newBest ? " · New personal best" : ""}</p></div>
+    <p>${pct >= 90 ? "You know this one. Try another position." : pct >= 60 ? "Getting there. Run it again and watch the steps you missed." : "Go back to Study and walk through it step by step, then try again."}</p>
+    <div class="controls"><button class="btn primary" data-act="where">Try again</button><button class="btn" data-act="quitquiz">Quiz menu</button><button class="btn" data-act="tostudy">Study it</button></div>`;
+}
+const fmt = n => Number.isInteger(n) ? n : n.toFixed(1);
+function lockIn() {
+  const q = S.quiz, play = S.plays.find(p => p.id === q.playId), sts = buildStates(play);
+  const a = sts[q.i - 1], b = sts[q.i], s = play.steps[q.i - 1];
+  const guess = q.guess || a.pos[q.me], d = dist(guess, b.pos[q.me]);
+  const movePts = d <= 3.5 ? 1 : d <= 6 ? .5 : 0;
+  const passQ = a.ball === q.me, passAns = s.pass && s.pass !== q.me ? s.pass : "none", passOk = passQ && q.pass === passAns;
+  q.pts += movePts + (passOk ? 1 : 0); q.max += 1 + (passQ ? 1 : 0);
+  q.last = { guess, d, movePts, passQ, passAns, passOk };
+  q.phase = "reveal"; renderWhere();
+}
+function nextWhere() {
+  const q = S.quiz, play = S.plays.find(p => p.id === q.playId);
+  if (q.i < play.steps.length) { q.i++; q.guess = null; q.pass = null; q.phase = "ask" }
+  else {
+    q.phase = "done";
+    const pct = Math.round(q.pts / q.max * 100), pr = prog(play.id);
+    q.newBest = pr.best == null || pct > pr.best;
+    if (q.newBest) { pr.best = pct; saveProgress() }
+  }
+  renderWhere();
+}
+function startName() {
+  const pool = S.plays; if (pool.length < 2) return;
+  const prev = S.quiz && S.quiz.type === "name" ? S.quiz : null;
+  let pick; do { pick = pool[Math.floor(Math.random() * pool.length)] } while (prev && pick.id === prev.playId);
+  const others = pool.filter(p => p.id !== pick.id).sort(() => Math.random() - .5).slice(0, 3);
+  const choices = [pick, ...others].sort(() => Math.random() - .5).map(p => p.id);
+  S.quiz = { type: "name", playId: pick.id, choices, answer: null, right: prev ? prev.right : 0, total: prev ? prev.total : 0 };
+  renderName(); runWhole(pick);
+}
+function runWhole(play) {
+  stopAnim();
+  const sts = buildStates(play);
+  scene(play, { pos: sts[0].pos, ball: sts[0].ball, paths: [] });
+  let i = 0;
+  const next = () => {
+    if (S.mode !== "quiz" || !S.quiz || S.quiz.type !== "name" || ++i > play.steps.length) return;
+    scene(play, { pos: sts[i - 1].pos, ball: sts[i - 1].ball, paths: pathsFor(play, sts, i) });
+    $("#capR").textContent = `Step ${i} of ${play.steps.length}`;
+    animateStep(play, sts, i, () => { S.timer = setTimeout(next, 800 / S.speed) });
+  };
+  $("#capR").textContent = "Setup";
+  S.timer = setTimeout(next, 900);
+}
+function renderName() {
+  const q = S.quiz;
+  const names = q.choices.map(id => S.plays.find(p => p.id === id)).filter(Boolean);
+  $("#panel").innerHTML = `<div><div class="sub">Name that play · ${q.right} of ${q.total} right</div><h2>Which play is this?</h2></div>
+    <div class="choices">${names.map(p => {
+      const cls = q.answer ? (p.id === q.playId ? "right" : p.id === q.answer ? "wrong" : "") : "";
+      return `<button class="btn ${cls}" data-guess="${esc(p.id)}" ${q.answer ? "disabled" : ""}><span class="side ${p.side[0]}">${p.side === "defense" ? "D" : "O"}</span>${esc(p.name)}</button>`;
+    }).join("")}</div>
+    ${q.answer ? `<div class="result ${q.answer === q.playId ? "good" : "bad"}">${q.answer === q.playId ? "Correct." : "Not that one. The right answer is highlighted."}</div>` : ""}
+    <div class="controls">${q.answer ? `<button class="btn primary" data-act="namequiz">Next play</button>` : ""}<button class="btn" data-act="replayname">Replay</button><button class="btn" data-act="quitquiz">Quiz menu</button></div>`;
+}
+
+/* ---------- editor (coach) ---------- */
+function newDraft() {
+  const start = {}; OFF_IDS.forEach(k => start[k] = DEFAULT_SPOT[k].slice());
+  return { id: newId(), name: "", side: "offense", category: "", summary: "", start, ball: "1", steps: [], roles: {}, example: false };
+}
+function openEditor(play) {
+  stopAnim(); S.gif = null;
+  S.edit = { draft: play ? clone(play) : newDraft(), isNew: !play, step: 0, confirm: false };
+  if (play) S.edit.draft.example = false;
+  S.mode = "edit";
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === "edit")));
+  renderEdit(); showTrace();
+}
+function traceControls() {
+  if (!S.trace) return `<div class="field"><label class="lbl" for="traceFile">Diagram to trace (optional)</label><input type="file" id="traceFile" accept="image/*"><span class="hint">Show a play diagram from a website or book under the court, then drag players on top of it.</span></div>`;
+  return `<div class="field"><span class="lbl">Diagram to trace</span><div class="trace-ctl"><label for="traceOp">Fade</label><input type="range" id="traceOp" min=".1" max=".9" step=".05" value="${S.trace.opacity}">
+    <label><input type="checkbox" id="traceFlip" ${S.trace.flip ? "checked" : ""}> Basket at bottom</label><button class="btn" data-act="untrace">Remove</button></div></div>`;
+}
+function renderEdit() {
+  const E = S.edit; if (!E) { const p = curPlay(); if (p) return openEditor(p); return openEditor(null) }
+  const d = E.draft, sts = buildStates(d), k = E.step;
+  const ids = Object.keys(d.start);
+  if (k === 0) {
+    scene(d, { pos: sts[0].pos, ball: sts[0].ball, paths: [], drag: { ids: new Set(ids), onDrop: (id, p) => { d.start[id] = p; renderEdit() } } });
+    $("#capR").textContent = "Setup · drag players to their starting spots";
+  } else {
+    const s = d.steps[k - 1], before = sts[k - 1];
+    const ghosts = Object.keys(s.moves).map(id => `<circle class="ghost" style="opacity:.5" cx="${before.pos[id][0]}" cy="${before.pos[id][1]}" r="1.7"/>`).join("");
+    scene(d, { pos: sts[k].pos, ball: sts[k].ball, paths: pathsFor(d, sts, k), ghosts,
+      drag: { ids: new Set(ids), onDrop: (id, p) => {
+        if (dist(p, before.pos[id]) < 1) delete s.moves[id];
+        else s.moves[id] = { to: p, kind: s.moves[id]?.kind || (before.ball === id ? "dribble" : "cut") };
+        renderEdit();
+      } } });
+    $("#capR").textContent = `Step ${k} · drag a player to where they go`;
+  }
+  const stepBtns = ["Set"].concat(d.steps.map((_, j) => j + 1)).map((l, j) => `<button data-estep="${j}" aria-current="${j === k}" aria-label="${j ? "Step " + j : "Setup"}">${l}</button>`).join("") + `<button class="add" data-act="addstep">+ Step</button>`;
+  let body;
+  if (k === 0) {
+    body = `<div class="field"><span class="lbl">Players on the floor</span><div class="toggles">${OFF_IDS.concat(DEF_IDS).map(t => `<label><input type="checkbox" data-tok="${t}" ${d.start[t] ? "checked" : ""}>${t}</label>`).join("")}</div></div>
+      <div class="field"><label class="lbl" for="eBall">Ball starts with</label><select id="eBall">${ids.map(t => `<option ${t === d.ball ? "selected" : ""}>${t}</option>`).join("")}</select></div>`;
+  } else {
+    const s = d.steps[k - 1], before = sts[k - 1];
+    const mv = Object.entries(s.moves);
+    body = `<div class="field"><label class="lbl" for="eNote">What happens on step ${k}</label><textarea id="eNote" rows="3" placeholder="e.g. 5 sets a ball screen for 1">${esc(s.note)}</textarea></div>
+      <div class="field"><span class="lbl">Moves</span>${mv.length ? `<div class="moves">${mv.map(([id, m]) => `<div class="mv"><span class="who" style="color:var(--${team(id) === "d" ? "def" : "off"})">${id}</span><select data-kind="${id}" aria-label="Move type for ${id}">${Object.entries(KIND_LABEL).map(([v, l]) => `<option value="${v}" ${v === m.kind ? "selected" : ""}>${l}</option>`).join("")}</select><button class="btn" data-unmove="${id}" aria-label="Remove move for ${id}">Remove</button></div>`).join("")}</div>` : `<p class="hint">No one moves yet. Drag a player on the court.</p>`}</div>
+      <div class="field"><label class="lbl" for="ePass">Pass (${before.ball} has the ball)</label><select id="ePass"><option value="">No pass</option>${ids.filter(t => t !== before.ball).map(t => `<option ${t === s.pass ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+      <div class="controls"><button class="btn danger" data-act="delstep">Delete step ${k}</button></div>`;
+  }
+  const roleIds = sideIds(d);
+  $("#panel").innerHTML = `<div><div class="sub">${E.isNew ? "New play" : "Editing"}</div><h2>${esc(d.name || "Untitled play")}</h2></div>
+    <div class="field"><label class="lbl" for="eName">Play name</label><input id="eName" value="${esc(d.name)}" placeholder="e.g. Horns Flare"></div>
+    <div class="row2"><div class="field"><label class="lbl" for="eSide">Side</label><select id="eSide"><option value="offense" ${d.side === "offense" ? "selected" : ""}>Offense</option><option value="defense" ${d.side === "defense" ? "selected" : ""}>Defense</option></select></div>
+    <div class="field"><label class="lbl" for="eCat">Category</label><input id="eCat" value="${esc(d.category)}" placeholder="e.g. Inbound"></div></div>
+    <div class="field"><label class="lbl" for="eSum">Summary</label><textarea id="eSum" rows="2" placeholder="What the play is for">${esc(d.summary)}</textarea></div>
+    ${traceControls()}
+    <div class="field"><span class="lbl">Steps</span><div class="steps">${stepBtns}</div></div>
+    ${body}
+    <details><summary class="lbl" style="cursor:pointer">Each player's job (${roleIds.length})</summary><div class="cards" style="margin-top:8px">${roleIds.map(t => `<div class="field"><label class="lbl" for="role-${t}">${t}</label><textarea id="role-${t}" data-role="${t}" rows="2">${esc(d.roles[t] || "")}</textarea></div>`).join("") || `<p class="hint">Add ${d.side} players first.</p>`}</div></details>
+    <hr class="sep">
+    <div class="controls"><button class="btn primary" data-act="save">Save play</button><button class="btn" data-act="cancel">Cancel</button>
+    ${E.isNew ? "" : E.confirm ? `<button class="btn danger solid" data-act="delyes">Yes, delete</button>` : `<button class="btn danger" data-act="del">Delete play</button>`}</div>
+    <p class="hint">Saved plays stay on this device until you download plays.json and upload it to the site.</p>`;
+}
+function toggleTok(t, on) {
+  const d = S.edit.draft;
+  if (on) d.start[t] = DEFAULT_SPOT[t].slice();
+  else {
+    if (Object.keys(d.start).length <= 1) return renderEdit();
+    delete d.start[t]; delete d.roles[t];
+    d.steps.forEach(s => { delete s.moves[t]; if (s.pass === t) s.pass = null });
+    if (d.ball === t) d.ball = Object.keys(d.start).find(k => team(k) === "o") || Object.keys(d.start)[0];
+  }
+  renderEdit();
+}
+function savePlay() {
+  const d = S.edit.draft;
+  if (!d.name.trim()) { toast("Give the play a name first."); $("#eName")?.focus(); return }
+  d.name = d.name.trim();
+  const clean = normPlay(d.id, toDoc(d)), plays = S.plays.slice(), i = plays.findIndex(p => p.id === d.id);
+  if (i >= 0) plays[i] = clean; else plays.push(clean);
+  commitLocal(plays);
+  S.sel = d.id; store.set("sel", S.sel); S.edit = null; S.step = 0;
+  toast(`Saved "${d.name}" on this device.`); renderList(); setMode("study");
+}
+function deletePlay() {
+  const d = S.edit.draft;
+  commitLocal(S.plays.filter(p => p.id !== d.id));
+  toast(`Deleted "${d.name}".`);
+  S.edit = null; S.sel = S.plays[0]?.id || null; renderList(); setMode("study");
+}
+
+/* ---------- import (coach) ---------- */
+const AI_PROMPT = `Convert this basketball play into a Chalk Talk play file. Reply with only JSON, no other text.
+
+Format:
+{"plays":[{"name":"...","side":"offense" or "defense","category":"...","summary":"one or two sentences",
+ "start":{"1":[x,y],"2":[x,y],"3":[x,y],"4":[x,y],"5":[x,y]},
+ "ball":"1",
+ "roles":{"1":"what player 1 does", "...":"..."},
+ "steps":[{"note":"what happens in this step","pass":"4","moves":{"5":{"to":[x,y],"kind":"cut"}}}]}]}
+
+Rules:
+- Coordinates are in feet on a half court. x runs from 0 (left sideline) to 50 (right sideline). y runs from 0 (baseline) to 47 (half-court line). The basket is at x=25, y=5.25. The top of the key is about [25,25], the wings about [9,22] and [41,22], the corners about [3,3] and [47,3], the blocks about [19,7] and [31,7], the elbows about [19,19] and [31,19]. An inbounder under the basket stands at y=-2.
+- Offensive players are "1" to "5". Defenders are "X1" to "X5". Include defenders only if the play shows them. For a defense, use "side":"defense" and include the offensive players too so the ball can move.
+- Each step lists only the players who move, with where they end up. "kind" is "cut", "dribble" (the ball handler moving with the ball) or "screen" (moving to set a screen).
+- "pass" is the player who catches a pass during that step. Leave it out if there is no pass.
+- Write notes in plain words a high school player understands, in your own words.
+
+The play:
+[Paste a description, the text from the page, or attach the diagram here]`;
+function renderImport() {
+  const play = curPlay();
+  if (play) { const sts = buildStates(play); scene(play, { pos: sts[0].pos, ball: sts[0].ball, paths: [] }) } else emptyStage("");
+  $("#capR").textContent = "";
+  $("#panel").innerHTML = `<h2>Import plays</h2>
+    <div class="cards">
+      <div class="card"><h3>From a play file</h3>
+        <p>Add plays from a Chalk Talk file (.json) another coach sent you, or paste play code from an AI assistant.</p>
+        <input type="file" id="importFile" accept=".json,application/json" multiple aria-label="Choose play files">
+        <div class="field"><label class="lbl" for="importText">Or paste play code</label><textarea class="code" id="importText" rows="5" placeholder='{"plays":[ ... ]}'></textarea></div>
+        <button class="btn primary" data-act="importtext">Add pasted plays</button>
+      </div>
+      <div class="card"><h3>Trace a diagram</h3>
+        <p>Found a play on a website or in a PDF? Take a screenshot, then choose it here. It shows up under the court so you can drag players on top of it. You can also paste a screenshot with Ctrl+V.</p>
+        <input type="file" id="traceFile2" accept="image/*" aria-label="Choose a diagram image">
+      </div>
+      <div class="card"><h3>Use an AI assistant</h3>
+        <p>Copy these instructions into Claude or another assistant, add the play's description or diagram, then paste its answer into the box above.</p>
+        <div class="controls"><button class="btn" data-act="copyprompt">Copy instructions</button></div>
+        <details><summary class="hint" style="cursor:pointer">Show the instructions</summary><textarea class="code" id="promptText" rows="8" readonly style="width:100%;margin-top:6px">${esc(AI_PROMPT)}</textarea></details>
+      </div>
+      <div class="card"><h3>Share the playbook</h3>
+        <p>Download every play as plays.json. Upload it to the website to publish your changes, or send it to another coach.</p>
+        <button class="btn" data-act="export" ${S.plays.length ? "" : "disabled"}>Download plays.json</button>
+      </div>
+    </div>`;
+}
+function importPlays(text, label) {
+  let parsed;
+  try { parsed = parsePlaybook(JSON.parse(text.trim().replace(/^```(json)?|```$/g, ""))) } catch { toast(`${label} isn't valid play code. Check that you copied all of it.`); return }
+  const good = parsed.filter(Boolean), bad = parsed.length - good.length;
+  if (!good.length) { toast(`No plays found in ${label}.`); return }
+  const plays = S.plays.slice(); let added = 0, updated = 0;
+  for (const p of good) { const i = plays.findIndex(x => x.id === p.id); if (i >= 0) { plays[i] = p; updated++ } else { plays.push(p); added++ } }
+  commitLocal(plays);
+  S.sel = good[0].id; store.set("sel", S.sel); S.step = 0;
+  toast([added && `Added ${added} play${added > 1 ? "s" : ""}`, updated && `updated ${updated}`, bad && `skipped ${bad} that couldn't be read`].filter(Boolean).join(", ") + ".");
+  renderList(); setMode("study");
+}
+
+/* ---------- GIF export ---------- */
+const GIF_COL = { apron: "#dfe5ea", floor: "#fbfcfd", paint: "#eef2f6", line: "#7d8b97", off: "#1d5bbf", def: "#c7322b", ball: "#e8742a", ink: "#18222c", muted: "#566472", white: "#ffffff", accent: "#b84f15" };
+function gifPalette() {
+  const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const pal = Object.values(GIF_COL).map(hex);
+  for (const s of ["line", "off", "def", "ball", "ink", "muted", "accent"]) for (const b of ["floor", "paint", "white"]) for (const t of [.3, .6]) {
+    const A = hex(GIF_COL[s]), B = hex(GIF_COL[b]); pal.push(A.map((v, i) => Math.round(v * t + B[i] * (1 - t))));
+  }
+  while (pal.length < 64) pal.push([0, 0, 0]);
+  return pal;
+}
+class GifWriter {
+  constructor(w, h, pal) {
+    this.w = w; this.h = h; this.pal = pal; this.out = []; this.cache = new Map();
+    const o = this.out, u16 = v => o.push(v & 255, v >> 8 & 255);
+    for (const c of "GIF89a") o.push(c.charCodeAt(0));
+    u16(w); u16(h); o.push(0xF5, 0, 0);
+    pal.forEach(c => o.push(c[0], c[1], c[2]));
+    o.push(0x21, 0xFF, 0x0B); for (const c of "NETSCAPE2.0") o.push(c.charCodeAt(0)); o.push(3, 1, 0, 0, 0);
+  }
+  nearest(r, g, b) {
+    const key = r << 16 | g << 8 | b; let hit = this.cache.get(key); if (hit !== undefined) return hit;
+    let best = 0, bd = Infinity;
+    for (let i = 0; i < this.pal.length; i++) { const c = this.pal[i], d = (c[0] - r) ** 2 + (c[1] - g) ** 2 + (c[2] - b) ** 2; if (d < bd) { bd = d; best = i } }
+    this.cache.set(key, best); return best;
+  }
+  addFrame(rgba, delayCs) {
+    const o = this.out, n = this.w * this.h, idx = new Uint8Array(n);
+    for (let i = 0, j = 0; i < n; i++, j += 4) idx[i] = this.nearest(rgba[j], rgba[j + 1], rgba[j + 2]);
+    o.push(0x21, 0xF9, 4, 0, delayCs & 255, delayCs >> 8 & 255, 0, 0);
+    o.push(0x2C, 0, 0, 0, 0, this.w & 255, this.w >> 8, this.h & 255, this.h >> 8, 0);
+    this.lzw(idx, 6);
+  }
+  lzw(ind, minSize) {
+    const o = this.out, clear = 1 << minSize, eoi = clear + 1;
+    let size = minSize + 1, next = eoi + 1, map = new Map(), cur = 0, nbits = 0, block = [];
+    const flush = () => { o.push(block.length); for (const v of block) o.push(v); block = [] };
+    const emit = c => { cur |= c << nbits; nbits += size; while (nbits >= 8) { block.push(cur & 255); cur >>>= 8; nbits -= 8; if (block.length === 255) flush() } };
+    o.push(minSize); emit(clear);
+    let prefix = ind[0];
+    for (let i = 1; i < ind.length; i++) {
+      const k = ind[i], key = prefix << 8 | k, hit = map.get(key);
+      if (hit !== undefined) { prefix = hit; continue }
+      emit(prefix);
+      if (next === 4096) { emit(clear); next = eoi + 1; size = minSize + 1; map = new Map() }
+      else { if (next >= 1 << size) size++; map.set(key, next++) }
+      prefix = k;
+    }
+    emit(prefix); emit(eoi);
+    if (nbits > 0) block.push(cur & 255);
+    if (block.length) flush();
+    o.push(0);
+  }
+  finish() { this.out.push(0x3B); return new Uint8Array(this.out) }
+}
+function drawGifFrame(ctx, play, W, H, s, f, paths, faint, caption) {
+  const C = GIF_COL;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = C.white; ctx.fillRect(0, 0, W, H);
+  ctx.setTransform(s, 0, 0, s, 2 * s, 4 * s);
+  ctx.fillStyle = C.apron; ctx.fillRect(-2, -4, 54, 53);
+  ctx.lineCap = "butt"; ctx.lineJoin = "miter";
+  for (const c of COURT) {
+    const p = new Path2D(c.d);
+    if (c.fill) { ctx.fillStyle = C[c.k]; ctx.fill(p); continue }
+    ctx.setLineDash(c.k === "dash" ? [.8, .6] : []);
+    ctx.strokeStyle = c.k === "rim" ? C.ball : C.line; ctx.lineWidth = c.k === "board" ? .3 : c.k === "rim" ? .22 : .16;
+    ctx.stroke(p);
+  }
+  ctx.setLineDash([]);
+  ctx.globalAlpha = faint ? .4 : 1; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  for (const p of paths) {
+    const g = pathGeom(p); if (!g) continue;
+    const col = p.team === "b" ? C.ball : p.team === "d" ? C.def : C.off;
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = .28; ctx.setLineDash(g.dash ? [.9, .7] : []);
+    ctx.beginPath(); g.pts.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.stroke();
+    ctx.setLineDash([]);
+    if (g.bar) { ctx.lineWidth = .4; ctx.beginPath(); ctx.moveTo(...g.bar[0]); ctx.lineTo(...g.bar[1]); ctx.stroke() }
+    if (g.arrow) {
+      const e = g.pts[g.pts.length - 1], u = g.u, n = [-u[1], u[0]], tip = [e[0] + u[0] * .42, e[1] + u[1] * .42], base = [e[0] - u[0] * .98, e[1] - u[1] * .98];
+      ctx.beginPath(); ctx.moveTo(...tip); ctx.lineTo(base[0] + n[0] * .7, base[1] + n[1] * .7); ctx.lineTo(base[0] - n[0] * .7, base[1] - n[1] * .7); ctx.closePath(); ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+  for (const id of tokOrder(play)) {
+    const p = f.pos[id]; if (!p) continue;
+    ctx.save(); ctx.translate(p[0], p[1]);
+    if (team(id) === "o") {
+      ctx.beginPath(); ctx.arc(0, 0, 1.7, 0, 7); ctx.fillStyle = C.floor; ctx.fill(); ctx.lineWidth = .3; ctx.strokeStyle = C.off; ctx.stroke();
+      ctx.fillStyle = C.off; ctx.font = '700 2.2px Kalam, "Comic Sans MS", cursive'; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic"; ctx.fillText(id, 0, .75);
+    } else {
+      ctx.beginPath(); ctx.arc(0, 0, 1.5, 0, 7); ctx.globalAlpha = .85; ctx.fillStyle = C.floor; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = C.def; ctx.lineWidth = .42; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(-1.15, -1.15); ctx.lineTo(1.15, 1.15); ctx.moveTo(1.15, -1.15); ctx.lineTo(-1.15, 1.15); ctx.stroke();
+      ctx.fillStyle = C.def; ctx.font = '700 1.6px Kalam, "Comic Sans MS", cursive'; ctx.textAlign = "left"; ctx.fillText(id.slice(1), 1.2, 2.15);
+    }
+    ctx.restore();
+  }
+  if (f.bp) {
+    ctx.beginPath(); ctx.arc(f.bp[0], f.bp[1], .85, 0, 7); ctx.fillStyle = C.ball; ctx.fill();
+    ctx.strokeStyle = C.floor; ctx.lineWidth = .12; ctx.beginPath(); ctx.moveTo(f.bp[0] - .85, f.bp[1]); ctx.lineTo(f.bp[0] + .85, f.bp[1]); ctx.moveTo(f.bp[0], f.bp[1] - .85); ctx.lineTo(f.bp[0], f.bp[1] + .85); ctx.stroke();
+  }
+  /* caption band under the court */
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const top = Math.round(53 * s);
+  ctx.fillStyle = C.line; ctx.fillRect(0, top, W, 1);
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = C.ink; ctx.font = '700 22px "Barlow Condensed", "Arial Narrow", sans-serif'; ctx.fillText(play.name.toUpperCase(), 14, top + 28);
+  ctx.fillStyle = C.accent; ctx.font = '700 15px Kalam, "Comic Sans MS", cursive'; ctx.textAlign = "right"; ctx.fillText(caption.tag, W - 14, top + 27);
+  ctx.textAlign = "left"; ctx.fillStyle = C.muted; ctx.font = '500 14px Barlow, "Segoe UI", sans-serif';
+  const words = caption.text.split(/\s+/), lines = [""];
+  for (const w of words) { const t = (lines[lines.length - 1] + " " + w).trim(); if (ctx.measureText(t).width > W - 28 && lines[lines.length - 1]) lines.push(w); else lines[lines.length - 1] = t }
+  if (lines.length > 3) { lines.length = 3; lines[2] = lines[2].replace(/\s*\S*$/, "") + "…" }
+  lines.forEach((l, i) => ctx.fillText(l, 14, top + 50 + i * 18));
+}
+async function makeGif(play) {
+  S.gif = { playId: play.id, status: "Making the GIF…" }; renderStudyPanel(play);
+  try {
+    await Promise.all(['700 22px "Barlow Condensed"', '500 14px Barlow', '700 15px Kalam'].map(f => document.fonts.load(f).catch(() => {})));
+    const W = 440, s = W / 54, H = Math.round(53 * s) + 108;
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d", { willReadFrequently: true });
+    const gw = new GifWriter(W, H, gifPalette()), sts = buildStates(play), N = play.steps.length, FR = 12;
+    const add = (f, paths, faint, cap, delay) => { drawGifFrame(ctx, play, W, H, s, f, paths, faint, cap); gw.addFrame(ctx.getImageData(0, 0, W, H).data, delay) };
+    const still = st => ({ pos: st.pos, bp: st.pos[st.ball] ? ballOff(st.pos[st.ball]) : null });
+    add(still(sts[0]), [], false, { tag: "Setup", text: play.summary || "Starting spots." }, 180);
+    for (let i = 1; i <= N; i++) {
+      if (S.gif?.playId !== play.id) return;
+      S.gif.status = `Making the GIF… step ${i} of ${N}`; renderStudyPanel(play);
+      await new Promise(r => setTimeout(r, 0));
+      const paths = pathsFor(play, sts, i), cap = { tag: `Step ${i} of ${N}`, text: play.steps[i - 1].note || "" };
+      for (let k = 1; k <= FR; k++) add(frameAt(play, sts, i, k / FR), paths, k < FR, cap, 8);
+      add(still(sts[i]), paths, false, cap, i === N ? 300 : 170);
+    }
+    const blob = new Blob([gw.finish()], { type: "image/gif" }), file = new File([blob], `${slug(play.name)}.gif`, { type: "image/gif" });
+    if (S.gif?.playId !== play.id) return;
+    S.gif = { playId: play.id, url: URL.createObjectURL(blob), size: blob.size, file, canShare: !!(navigator.canShare && navigator.canShare({ files: [file] })) };
+  } catch (e) {
+    console.error(e); S.gif = null; toast("Couldn't make the GIF on this device.");
+  }
+  if (S.mode === "study" && curPlay()?.id === play.id) renderStudyPanel(play);
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.filter) { S.filter = t.dataset.filter; store.set("filter", S.filter); renderList(); return }
+  if (t.dataset.play) {
+    S.sel = t.dataset.play; store.set("sel", S.sel); S.step = 0; S.gif = null; renderList();
+    if (S.mode === "edit") openEditor(curPlay()); else setMode(S.mode === "quiz" ? "quiz" : S.mode === "import" ? "import" : "study");
+    return;
+  }
+  if (t.dataset.mode) { if (t.dataset.mode === "edit") openEditor(curPlay()); else setMode(t.dataset.mode); return }
+  if (t.dataset.step != null) { goStep(+t.dataset.step); return }
+  if (t.dataset.estep != null) { S.edit.step = +t.dataset.estep; S.edit.confirm = false; renderEdit(); return }
+  if (t.dataset.pass) { S.quiz.pass = t.dataset.pass; renderWhere(); return }
+  if (t.dataset.guess) { const q = S.quiz; q.answer = t.dataset.guess; q.total++; if (q.answer === q.playId) q.right++; renderName(); return }
+  if (t.dataset.unmove) { delete S.edit.draft.steps[S.edit.step - 1].moves[t.dataset.unmove]; renderEdit(); return }
+  const act = t.dataset.act; if (!act) return;
+  ({
+    restart: () => goStep(0), prev: () => goStep(S.step - 1), next: () => goStep(S.step + 1), play: togglePlay,
+    where: startWhere, lock: lockIn, qnext: nextWhere,
+    qreplay: () => { const q = S.quiz, play = S.plays.find(p => p.id === q.playId), sts = buildStates(play); scene(play, { pos: sts[q.i - 1].pos, ball: sts[q.i - 1].ball, paths: pathsFor(play, sts, q.i), me: q.me }); animateStep(play, sts, q.i) },
+    quitquiz: () => { stopAnim(); S.quiz = null; renderQuiz() },
+    tostudy: () => { S.step = 0; setMode("study") },
+    namequiz: startName,
+    replayname: () => { const p = S.plays.find(x => x.id === S.quiz.playId); if (p) runWhole(p) },
+    new: () => openEditor(null),
+    addstep: () => { const d = S.edit.draft; d.steps.splice(S.edit.step, 0, { note: "", pass: null, moves: {} }); S.edit.step++; renderEdit() },
+    delstep: () => { const d = S.edit.draft; d.steps.splice(S.edit.step - 1, 1); S.edit.step = Math.min(S.edit.step, d.steps.length); renderEdit() },
+    save: savePlay, cancel: () => { S.edit = null; setMode("study") },
+    del: () => { S.edit.confirm = true; renderEdit() }, delyes: deletePlay,
+    untrace: () => { S.trace = null; renderEdit(); showTrace() },
+    export: exportPlaybook,
+    discard: () => { S.confirmDiscard = true; renderHeader() }, discardyes: discardLocal,
+    importtext: () => { const v = $("#importText").value; if (v.trim()) importPlays(v, "The pasted text"); else toast("Paste some play code first.") },
+    copyprompt: () => {
+      const done = () => toast("Instructions copied.");
+      const fallback = () => { const ta = $("#promptText"); ta.closest("details").open = true; ta.select(); toast("Press Ctrl+C (or Copy) to copy the selected instructions.") };
+      navigator.clipboard ? navigator.clipboard.writeText(AI_PROMPT).then(done, fallback) : fallback();
+    },
+    gif: () => { const p = curPlay(); if (p) makeGif(p) },
+    closegif: () => { S.gif = null; renderStudyPanel(curPlay()) },
+    sharegif: () => { const g = S.gif; navigator.share({ files: [g.file], title: curPlay()?.name }).catch(() => {}) }
+  })[act]?.();
+});
+$("#newBtn").addEventListener("click", () => openEditor(null));
+$("#coachToggle").addEventListener("click", () => {
+  S.coach = !S.coach; store.set("coach", S.coach);
+  if (S.coach) { const local = store.get("localPlaybook", null); if (local) { S.plays = parsePlaybook(local).filter(Boolean); S.localDirty = true; sortPlays() } toast("Coach tools on. Changes stay on this device until you publish them.") }
+  else { S.plays = clone(S.sitePlays); S.localDirty = false; sortPlays(); if (!curPlay()) S.sel = S.plays[0]?.id || null }
+  renderHeader(); renderList(); setMode("study");
+});
+$("#q").addEventListener("input", e => { S.q = e.target.value; renderList() });
+document.addEventListener("change", e => {
+  const t = e.target, play = curPlay();
+  if (t.id === "mePick" && play) { S.me[play.id] = t.value; store.set("me", S.me); renderStudy(); return }
+  if (t.id === "quizMe" && play) { S.me[play.id] = t.value; store.set("me", S.me); renderQuiz(); return }
+  if (t.id === "speed") { S.speed = +t.value; store.set("speed", S.speed); return }
+  if (t.id === "importFile") {
+    for (const f of t.files) f.text().then(txt => importPlays(txt, f.name));
+    return;
+  }
+  if (t.id === "traceFile" || t.id === "traceFile2") { loadTrace(t.files[0]); return }
+  if (t.id === "traceFlip") { S.trace.flip = t.checked; showTrace(); return }
+  if (!S.edit) return;
+  const d = S.edit.draft;
+  if (t.dataset.tok) return toggleTok(t.dataset.tok, t.checked);
+  if (t.id === "eBall") { d.ball = t.value; return renderEdit() }
+  if (t.id === "eSide") { d.side = t.value; return renderEdit() }
+  if (t.id === "ePass") { d.steps[S.edit.step - 1].pass = t.value || null; return renderEdit() }
+  if (t.dataset.kind) { d.steps[S.edit.step - 1].moves[t.dataset.kind].kind = t.value; return renderEdit() }
+});
+document.addEventListener("input", e => {
+  const t = e.target;
+  if (t.id === "traceOp" && S.trace) { S.trace.opacity = +t.value; showTrace(); return }
+  if (!S.edit) return; const d = S.edit.draft;
+  if (t.id === "eName") d.name = t.value;
+  else if (t.id === "eCat") d.category = t.value;
+  else if (t.id === "eSum") d.summary = t.value;
+  else if (t.id === "eNote") d.steps[S.edit.step - 1].note = t.value;
+  else if (t.dataset.role) d.roles[t.dataset.role] = t.value;
+});
+document.addEventListener("paste", e => {
+  if (!S.coach || (S.mode !== "import" && S.mode !== "edit")) return;
+  const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith("image/"));
+  if (item) { e.preventDefault(); loadTrace(item.getAsFile()) }
+});
+document.addEventListener("keydown", e => {
+  if (S.mode !== "study" || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); goStep(S.step + 1) }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); goStep(S.step - 1) }
+  else if (e.key === " " && e.target.tagName !== "BUTTON") { e.preventDefault(); togglePlay() }
+});
+let toastT;
+function toast(msg) { const el = $("#toast"); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 3200) }
+
+/* ---------- loading ---------- */
+function sortPlays() { S.plays.sort((a, b) => b.side.localeCompare(a.side) || a.name.localeCompare(b.name)) }
+async function boot() {
+  let site = null;
+  try { const r = await fetch("plays.json", { cache: "no-cache" }); if (r.ok) site = parsePlaybook(await r.json()).filter(Boolean) } catch {}
+  S.siteMissing = !site;
+  S.sitePlays = site || STARTER.map(p => normPlay(p.id, p));
+  const local = S.coach ? store.get("localPlaybook", null) : null;
+  if (local) { S.plays = parsePlaybook(local).filter(Boolean); S.localDirty = true }
+  else S.plays = clone(S.sitePlays);
+  sortPlays();
+  S.loaded = true;
+  if (!curPlay()) { S.sel = S.plays[0]?.id || null; S.step = 0 }
+  renderHeader(); renderList(); renderStage();
+}
+renderHeader(); renderStage(); boot();
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>

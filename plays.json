@@ -1,0 +1,633 @@
+{
+ "app": "chalk-talk",
+ "version": 1,
+ "plays": [
+  {
+   "id": "ex-horns",
+   "example": true,
+   "name": "Horns Elbow Entry",
+   "side": "offense",
+   "category": "Half-court set",
+   "summary": "Bigs at both elbows, shooters in the corners. Enter to the elbow, then flow into a hand-off and a downhill drive.",
+   "start": {
+    "1": [
+     25,
+     32
+    ],
+    "2": [
+     3,
+     3
+    ],
+    "3": [
+     47,
+     3
+    ],
+    "4": [
+     19,
+     19
+    ],
+    "5": [
+     31,
+     19
+    ]
+   },
+   "ball": "1",
+   "roles": {
+    "1": "Make the entry pass on time, then space out to the right wing.",
+    "2": "Stay in the corner until 1 passes. Lift to the wing and come hard off the hand-off.",
+    "3": "Stay wide in the right corner and be ready for the kick-out.",
+    "4": "Catch, face up and look for 5 first. Then dribble into the hand-off and roll.",
+    "5": "Roll hard to the rim after the entry. Clear to the short corner when 2 drives."
+   },
+   "steps": [
+    {
+     "note": "1 passes to 4 at the left elbow. 5 rolls hard to the rim.",
+     "pass": "4",
+     "moves": {
+      "5": {
+       "to": [
+        28,
+        6
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "1 cuts away to the right wing. 2 lifts from the corner to the left wing.",
+     "moves": {
+      "1": {
+       "to": [
+        41,
+        23
+       ],
+       "kind": "cut"
+      },
+      "2": {
+       "to": [
+        8,
+        21
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "4 dribbles at 2 and hands it off. 2 takes it toward the middle.",
+     "pass": "2",
+     "moves": {
+      "2": {
+       "to": [
+        15,
+        27
+       ],
+       "kind": "cut"
+      },
+      "4": {
+       "to": [
+        12,
+        22
+       ],
+       "kind": "dribble"
+      }
+     }
+    },
+    {
+     "note": "2 attacks the lane. 4 seals and rolls to the block. 5 clears to the short corner.",
+     "moves": {
+      "2": {
+       "to": [
+        21,
+        13
+       ],
+       "kind": "dribble"
+      },
+      "4": {
+       "to": [
+        19,
+        6
+       ],
+       "kind": "cut"
+      },
+      "5": {
+       "to": [
+        40,
+        6
+       ],
+       "kind": "cut"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "ex-spread-pnr",
+   "example": true,
+   "name": "Spread Pick and Roll",
+   "side": "offense",
+   "category": "Ball screen",
+   "summary": "Four out, one in. A high ball screen with room for the roller and shooters spotted up.",
+   "start": {
+    "1": [
+     25,
+     33
+    ],
+    "2": [
+     8,
+     22
+    ],
+    "3": [
+     47,
+     3
+    ],
+    "4": [
+     3,
+     3
+    ],
+    "5": [
+     31,
+     7
+    ]
+   },
+   "ball": "1",
+   "roles": {
+    "1": "Wait for the screen. Come off it tight, shoulder to hip, and read the roller.",
+    "2": "Lift to the top as the safety when 1 comes off the screen.",
+    "3": "Stay in the right corner. If your defender helps on the roll, you're open.",
+    "4": "Stay in the left corner and keep your defender far from the paint.",
+    "5": "Sprint up, set a solid screen on the right side of 1's defender, then roll to the rim."
+   },
+   "steps": [
+    {
+     "note": "5 sprints up and sets a ball screen on the right side of 1's defender.",
+     "moves": {
+      "5": {
+       "to": [
+        28,
+        30
+       ],
+       "kind": "screen"
+      }
+     }
+    },
+    {
+     "note": "1 uses the screen going right. 5 rolls to the rim. 2 lifts to the top as the safety.",
+     "moves": {
+      "1": {
+       "to": [
+        34,
+        24
+       ],
+       "kind": "dribble"
+      },
+      "2": {
+       "to": [
+        16,
+        30
+       ],
+       "kind": "cut"
+      },
+      "5": {
+       "to": [
+        25,
+        10
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "1 hits 5 on the roll for a layup. If the roll is covered, kick to 3 in the corner.",
+     "pass": "5",
+     "moves": {
+      "5": {
+       "to": [
+        25,
+        6
+       ],
+       "kind": "cut"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "ex-box-blob",
+   "example": true,
+   "name": "Box Back Screen",
+   "side": "offense",
+   "category": "Inbound (baseline)",
+   "summary": "Baseline out of bounds from a box set. A decoy cut clears the left side, then a back screen frees 1 at the rim.",
+   "start": {
+    "1": [
+     31,
+     17
+    ],
+    "2": [
+     19,
+     17
+    ],
+    "3": [
+     33,
+     -2
+    ],
+    "4": [
+     31,
+     7
+    ],
+    "5": [
+     19,
+     7
+    ]
+   },
+   "ball": "3",
+   "roles": {
+    "1": "Wait for 4 to screen, then cut off the screen straight to the front of the rim.",
+    "2": "Sprint to the left corner. Your cut pulls a defender away.",
+    "3": "Slap the ball to start it. Look for 1 first, then 5 at the elbow.",
+    "4": "Step up and back-screen 1's defender. Hold it until 1 is past you.",
+    "5": "Pop to the left elbow as the safety outlet."
+   },
+   "steps": [
+    {
+     "note": "2 cuts hard to the left corner as a decoy. 4 steps up and back-screens for 1.",
+     "moves": {
+      "2": {
+       "to": [
+        4,
+        4
+       ],
+       "kind": "cut"
+      },
+      "4": {
+       "to": [
+        30,
+        12
+       ],
+       "kind": "screen"
+      }
+     }
+    },
+    {
+     "note": "1 cuts off the screen to the front of the rim. 5 pops to the left elbow as the safety.",
+     "moves": {
+      "1": {
+       "to": [
+        27,
+        3.5
+       ],
+       "kind": "cut"
+      },
+      "5": {
+       "to": [
+        19,
+        21
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "3 passes to 1 for the layup. If it's covered, throw to 5 at the elbow.",
+     "pass": "1",
+     "moves": {}
+    }
+   ]
+  },
+  {
+   "id": "ex-zone-23",
+   "example": true,
+   "name": "2-3 Zone Slides",
+   "side": "defense",
+   "category": "Zone",
+   "summary": "Where each defender goes as the ball moves from the top, to the wing, to the corner and on a skip pass.",
+   "start": {
+    "1": [
+     25,
+     31
+    ],
+    "2": [
+     41,
+     22
+    ],
+    "3": [
+     9,
+     22
+    ],
+    "4": [
+     25,
+     19
+    ],
+    "5": [
+     46,
+     4
+    ],
+    "X1": [
+     20,
+     25
+    ],
+    "X2": [
+     30,
+     25
+    ],
+    "X3": [
+     13,
+     9
+    ],
+    "X4": [
+     37,
+     9
+    ],
+    "X5": [
+     25,
+     7
+    ]
+   },
+   "ball": "1",
+   "roles": {
+    "X1": "Top left. You drop to the high post when the ball goes right and close out when it comes back to your side.",
+    "X2": "Top right. Close out on the right wing. When the ball goes to the corner, drop to the elbow.",
+    "X3": "Back left. Slide to the middle of the lane when the ball is on the right side.",
+    "X4": "Back right. Slide out to the corner and close out when the ball gets there.",
+    "X5": "Middle. Always be on the ball side of the block. Front the post when the ball is in the corner."
+   },
+   "steps": [
+    {
+     "note": "Ball to the right wing. X2 closes out on the ball. X1 drops to the high post. X4 slides toward the corner, X5 to the ball-side block, X3 to the middle of the lane.",
+     "pass": "2",
+     "moves": {
+      "X2": {
+       "to": [
+        37,
+        22
+       ],
+       "kind": "cut"
+      },
+      "X1": {
+       "to": [
+        26,
+        22
+       ],
+       "kind": "cut"
+      },
+      "X4": {
+       "to": [
+        42,
+        11
+       ],
+       "kind": "cut"
+      },
+      "X5": {
+       "to": [
+        31,
+        7
+       ],
+       "kind": "cut"
+      },
+      "X3": {
+       "to": [
+        22,
+        8
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "Ball to the corner. X4 closes out. X5 fronts the block. X2 drops to the elbow, X1 takes the high post, X3 protects the rim.",
+     "pass": "5",
+     "moves": {
+      "X4": {
+       "to": [
+        43,
+        7
+       ],
+       "kind": "cut"
+      },
+      "X5": {
+       "to": [
+        34,
+        5
+       ],
+       "kind": "cut"
+      },
+      "X2": {
+       "to": [
+        36,
+        15
+       ],
+       "kind": "cut"
+      },
+      "X1": {
+       "to": [
+        27,
+        20
+       ],
+       "kind": "cut"
+      },
+      "X3": {
+       "to": [
+        24,
+        6
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "Skip pass to the left wing. Everyone sprints: X1 closes out, X3 gets back to the left block, X5 to the middle, X4 to the right block, X2 to the high post.",
+     "pass": "3",
+     "moves": {
+      "X1": {
+       "to": [
+        12,
+        23
+       ],
+       "kind": "cut"
+      },
+      "X3": {
+       "to": [
+        13,
+        10
+       ],
+       "kind": "cut"
+      },
+      "X5": {
+       "to": [
+        20,
+        7
+       ],
+       "kind": "cut"
+      },
+      "X4": {
+       "to": [
+        31,
+        8
+       ],
+       "kind": "cut"
+      },
+      "X2": {
+       "to": [
+        24,
+        22
+       ],
+       "kind": "cut"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "ex-hedge",
+   "example": true,
+   "name": "Ball Screen Hedge",
+   "side": "defense",
+   "category": "Man-to-man coverage",
+   "summary": "How we guard a high ball screen: talk early, hedge to stop the ball, tag the roller, then recover.",
+   "start": {
+    "1": [
+     25,
+     33
+    ],
+    "2": [
+     8,
+     22
+    ],
+    "3": [
+     47,
+     3
+    ],
+    "4": [
+     3,
+     3
+    ],
+    "5": [
+     31,
+     7
+    ],
+    "X1": [
+     25,
+     29
+    ],
+    "X2": [
+     11,
+     19
+    ],
+    "X3": [
+     43,
+     6
+    ],
+    "X4": [
+     7,
+     7
+    ],
+    "X5": [
+     29,
+     10
+    ]
+   },
+   "ball": "1",
+   "roles": {
+    "X1": "Hear the call, then fight over the top of the screen. Recover to the ball fast.",
+    "X2": "Stay in the gap between your player and the ball.",
+    "X3": "Stay home in the corner. Don't leave a shooter.",
+    "X4": "You're the low helper. Tag the roller, then get back to the corner.",
+    "X5": "Call 'Screen right!' early. Jump out to stop the ball, then sprint back to the roller."
+   },
+   "steps": [
+    {
+     "note": "5 comes up to set the ball screen. X5 calls \"Screen right!\" and follows one step behind.",
+     "moves": {
+      "5": {
+       "to": [
+        28,
+        30
+       ],
+       "kind": "screen"
+      },
+      "X5": {
+       "to": [
+        30,
+        27
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "1 turns the corner. X5 jumps out to stop the ball (hedge). X1 fights over the top. X4 leaves the corner to tag the roller.",
+     "moves": {
+      "1": {
+       "to": [
+        34,
+        25
+       ],
+       "kind": "dribble"
+      },
+      "5": {
+       "to": [
+        26,
+        16
+       ],
+       "kind": "cut"
+      },
+      "X5": {
+       "to": [
+        36,
+        22
+       ],
+       "kind": "cut"
+      },
+      "X1": {
+       "to": [
+        32,
+        28
+       ],
+       "kind": "cut"
+      },
+      "X4": {
+       "to": [
+        23,
+        13
+       ],
+       "kind": "cut"
+      }
+     }
+    },
+    {
+     "note": "X1 recovers to the ball. X5 sprints back to the roller. X4 returns to the corner.",
+     "moves": {
+      "5": {
+       "to": [
+        25,
+        10
+       ],
+       "kind": "cut"
+      },
+      "X1": {
+       "to": [
+        32,
+        22
+       ],
+       "kind": "cut"
+      },
+      "X5": {
+       "to": [
+        26,
+        12.5
+       ],
+       "kind": "cut"
+      },
+      "X4": {
+       "to": [
+        7,
+        7
+       ],
+       "kind": "cut"
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
