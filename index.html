@@ -60,8 +60,13 @@ a { color: var(--accent) }
 .chip b { color: var(--ink); font-weight: 600 }
 .chip.coach { border-color: var(--accent); color: var(--accent); font-weight: 600 }
 
-.app { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 16px; align-items: start }
-.lib { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; max-height: calc(100vh - 100px); position: sticky; top: 12px; min-width: 0 }
+.app { display: grid; grid-template-columns: 270px minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 12px 16px; align-items: start }
+.lib { grid-column: 1; grid-row: 1 / span 2; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; max-height: calc(100vh - 100px); position: sticky; top: 12px; min-width: 0 }
+.nav { grid-column: 2; grid-row: 1; display: flex; gap: 4px; border-bottom: 2px solid var(--line); min-width: 0 }
+.nav button { border: 0; background: none; padding: 8px 14px; font-family: var(--display); font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; display: flex; align-items: center; gap: 7px }
+.nav button svg { width: 18px; height: 18px; fill: currentColor; flex: none }
+.nav button[aria-current="page"] { color: var(--ink); border-color: var(--accent) }
+.nav .phone-only { display: none }
 .lib-head { padding: 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line) }
 .lib-head .row { display: flex; gap: 8px; align-items: center; justify-content: space-between }
 .lib-head h2 { font-size: 20px; text-transform: uppercase }
@@ -84,10 +89,27 @@ a { color: var(--accent) }
 .done { color: var(--good); font-weight: 600 }
 .empty { padding: 18px 12px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 10px }
 
-.stage { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
-.tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--line); overflow-x: auto }
-.tabs button { border: 0; background: none; padding: 8px 14px; font-family: var(--display); font-size: 18px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap }
-.tabs button[aria-selected="true"] { color: var(--ink); border-color: var(--accent) }
+.stage { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.back { align-self: flex-start; border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; font-size: 14px }
+.transport { display: grid; grid-template-columns: 44px 44px minmax(0, 1fr) 44px; gap: 6px }
+.transport .btn { min-height: 44px }
+.transport .btn svg { width: 20px; height: 20px }
+.iplay { display: flex; align-items: center; gap: 10px }
+.iplay .lbl { flex: none }
+.more { border-top: 1px solid var(--line); padding-top: 10px }
+.more summary { cursor: pointer; font-weight: 600; color: var(--muted); font-size: 14px; padding: 4px 0; list-style-position: inside }
+.more[open] summary { margin-bottom: 10px }
+.more .inner { display: flex; flex-direction: column; gap: 14px }
+.bigbtns { display: flex; flex-direction: column; gap: 8px }
+.bigbtns .btn { flex-direction: column; align-items: flex-start; gap: 1px; min-height: 48px; padding: 10px 14px; font-size: 15px; text-align: left }
+.bigbtns .btn small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px }
+.bigbtns .btn.primary small { color: inherit; opacity: .85 }
+.status { border-radius: 9px; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px }
+.status.ok { background: color-mix(in srgb, var(--good) 12%, transparent) }
+.status.pending { background: color-mix(in srgb, var(--accent) 12%, transparent) }
+.howto { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px }
+.phone-hint { display: none }
+@media (max-width: 760px) { .phone-hint { display: block } }
 .work { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start }
 .board-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px; min-width: 0 }
 #board { display: block; width: 100%; max-width: 100%; height: auto; max-height: 76vh; margin: 0 auto; touch-action: none; user-select: none; -webkit-user-select: none }
@@ -183,10 +205,27 @@ footer button { border: 0; background: none; padding: 0; color: var(--accent); f
 
 @media (max-width: 1080px) { .work { grid-template-columns: minmax(0, 1fr) } }
 @media (max-width: 760px) {
-  .app { grid-template-columns: minmax(0, 1fr) }
-  .lib { position: static; max-height: 300px }
-  .brand h1 { font-size: 26px }
-  .tabs button { font-size: 16px; padding: 8px 10px }
+  body { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) }
+  .top { padding-block: 10px }
+  .brand small, .desk-only { display: none }
+  .brand h1 { font-size: 24px }
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: none }
+  .lib, .stage { grid-column: auto; grid-row: auto }
+  .lib { position: static; max-height: none; border-radius: 12px }
+  .item { padding: 12px }
+  .item .nm { font-size: 17px }
+  body[data-view="plays"] .stage, body:not([data-view="plays"]) .lib { display: none }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; background: var(--surface); border-top: 1px solid var(--line); border-bottom: 0;
+    padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); gap: 4px }
+  .nav button { flex: 1; flex-direction: column; gap: 2px; font-family: var(--body); font-size: 11.5px; letter-spacing: .02em; text-transform: none; border: 0; margin: 0; padding: 6px 2px; border-radius: 10px }
+  .nav button svg { width: 24px; height: 24px }
+  .nav button[aria-current="page"] { color: var(--accent); background: var(--surface-2) }
+  .nav .phone-only { display: flex }
+  .board-wrap { padding: 6px }
+  #board { max-height: 56vh }
+  .panel { padding: 14px }
+  .panel h2 { font-size: 24px }
+  .steps button { min-width: 40px; height: 36px }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important } }
 </style>
@@ -214,13 +253,14 @@ footer button { border: 0; background: none; padding: 0; color: var(--accent); f
     <div class="list" id="list"><div class="empty">Loading the playbook…</div></div>
   </aside>
 
+  <nav class="nav" aria-label="Sections">
+    <button data-mode="plays" class="phone-only"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h16v2H4z"/></svg>Plays</button>
+    <button data-mode="study"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Study</button>
+    <button data-mode="quiz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 16h-2v-2h2zm2.1-7.7-.9.9c-.7.7-1.2 1.3-1.2 2.8h-2v-.5c0-1.1.4-2.1 1.2-2.8l1.2-1.3a2 2 0 1 0-3.4-1.4H8a4 4 0 1 1 7.1 2.3z"/></svg>Quiz</button>
+    <button data-mode="coach" id="coachNav" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zm2 2v8h14V6zm3 12h8v2H8zM7 8l3 3-3 3-1-1 2-2-2-2zm5 4h5v2h-5z"/></svg>Coach</button>
+  </nav>
+
   <main class="stage">
-    <div class="tabs" role="tablist">
-      <button role="tab" data-mode="study" aria-selected="true">Study</button>
-      <button role="tab" data-mode="quiz" aria-selected="false">Quiz</button>
-      <button role="tab" data-mode="edit" aria-selected="false" class="coach-only" hidden>Edit</button>
-      <button role="tab" data-mode="import" aria-selected="false" class="coach-only" hidden>Import</button>
-    </div>
     <div class="work">
       <div class="board-wrap">
         <svg id="board" viewBox="-2 -4 54 53" role="img" aria-label="Half court diagram">
@@ -245,8 +285,7 @@ footer button { border: 0; background: none; padding: 0; color: var(--accent); f
 </div>
 <footer>
   <span>On your phone, open this page and choose <b>Add to Home Screen</b> to keep it like an app.</span>
-  <span class="spacer"></span>
-  <button id="coachToggle">Turn on coach tools</button>
+  <button id="coachToggle">I'm a coach</button>
 </footer>
 <div class="toast" id="toast" hidden></div>
 
@@ -334,7 +373,7 @@ const S = {
   plays: [], sitePlays: [], loaded: false, siteMissing: false, localDirty: false,
   coach: store.get("coach", false) || location.hash === "#coach",
   sel: store.get("sel", null), filter: store.get("filter", "all"), q: "",
-  mode: "study", step: 0, playing: false, speed: store.get("speed", 1), timer: null, anim: null,
+  mode: matchMedia("(max-width: 760px)").matches ? "plays" : "study", step: 0, playing: false, speed: store.get("speed", 1), timer: null, anim: null,
   me: store.get("me", {}), progress: store.get("progress", {}), quiz: null, edit: null, drag: null,
   trace: null, gif: null, confirmDiscard: false
 };
@@ -481,9 +520,10 @@ function animateStep(play, sts, i, done) {
 /* dragging */
 const svg = $("#board");
 function svgPt(e) { const p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; const r = p.matrixTransform(svg.getScreenCTM().inverse()); return [clamp(r.x, -1, 51), clamp(r.y, -3, 48)] }
-let dragging = null;
+let dragging = null, swipe = null;
 svg.addEventListener("pointerdown", e => {
-  const g = e.target.closest(".tok"); if (!g || !S.drag || !S.drag.ids.has(g.dataset.id)) return;
+  const g = e.target.closest(".tok");
+  if (!g || !S.drag || !S.drag.ids.has(g.dataset.id)) { if (S.mode === "study" || S.mode === "plays") swipe = { x: e.clientX, y: e.clientY }; return }
   e.preventDefault(); stopAnim(); dragging = g.dataset.id; svg.setPointerCapture(e.pointerId);
 });
 svg.addEventListener("pointermove", e => {
@@ -492,11 +532,16 @@ svg.addEventListener("pointermove", e => {
   if (S.ballHolder === dragging) place({}, ballOff(p));
 });
 svg.addEventListener("pointerup", e => {
+  if (swipe) {
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y; swipe = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) { S.playing = false; goStep(S.step + (dx < 0 ? 1 : -1)) }
+    return;
+  }
   if (!dragging) return;
   const id = dragging, p = svgPt(e).map(v => Math.round(v * 2) / 2); dragging = null;
   S.drag && S.drag.onDrop(id, p);
 });
-svg.addEventListener("pointercancel", () => { dragging = null });
+svg.addEventListener("pointercancel", () => { dragging = null; swipe = null });
 
 /* ---------- tracing a diagram ---------- */
 function showTrace() {
@@ -534,7 +579,7 @@ function discardLocal() {
   store.del("localPlaybook"); S.localDirty = false; S.confirmDiscard = false;
   S.plays = clone(S.sitePlays); sortPlays();
   if (!curPlay()) S.sel = S.plays[0]?.id || null;
-  toast("Back to the published playbook."); renderHeader(); renderList(); setMode("study");
+  toast("Back to the published playbook."); renderHeader(); renderList(); setMode("coach");
 }
 function exportPlaybook() {
   const data = { app: "chalk-talk", version: 1, exportedAt: new Date().toISOString(), plays: S.plays.map(toDoc) };
@@ -551,10 +596,15 @@ function renderHeader() {
   $("#progChip").innerHTML = `Studied <b>${n} of ${S.plays.length}</b>`;
   $("#coachChip").hidden = !S.coach;
   $("#newBtn").hidden = !S.coach;
-  document.querySelectorAll(".coach-only").forEach(b => b.hidden = !S.coach);
-  $("#coachToggle").textContent = S.coach ? "Turn off coach tools" : "Turn on coach tools";
-  $("#unpub").innerHTML = S.coach && S.localDirty ? `<div class="unpub"><span><b>Not published yet.</b> Your changes are only on this device. Download plays.json and upload it to the site to share them.</span>
-    <div class="controls"><button class="btn primary" data-act="export">Download plays.json</button>${S.confirmDiscard ? `<button class="btn danger solid" data-act="discardyes">Yes, discard</button>` : `<button class="btn danger" data-act="discard">Discard</button>`}</div></div>` : "";
+  $("#coachNav").hidden = !S.coach;
+  $("#coachToggle").hidden = S.coach;
+  $("#unpub").innerHTML = S.coach && S.localDirty ? `<div class="unpub"><span><b>Not published yet.</b> Players can't see your changes until you publish.</span>
+    <div class="controls">${ghReady() ? `<button class="btn primary" data-act="publish" ${S.publishing ? "disabled" : ""}>${S.publishing ? "Publishing…" : "Publish to team"}</button>` : `<button class="btn primary" data-mode="coach">Set up publishing</button>`}${S.confirmDiscard ? `<button class="btn danger solid" data-act="discardyes">Yes, discard</button>` : `<button class="btn danger" data-act="discard">Discard</button>`}</div></div>` : "";
+  document.querySelectorAll(".nav button").forEach(b => {
+    const group = { edit: "coach", import: "coach" }[S.mode] || S.mode;
+    b.setAttribute("aria-current", b.dataset.mode === group ? "page" : "false");
+  });
+  document.body.dataset.view = S.mode;
 }
 function renderList() {
   document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.filter === S.filter)));
@@ -572,7 +622,7 @@ function renderList() {
   el.innerHTML = items.map(p => {
     const pr = S.progress[p.id] || {};
     const st = [pr.studied ? `<span class="done">✓ Studied</span>` : "", pr.best != null ? `<span>Quiz best ${pr.best}%</span>` : ""].filter(Boolean).join("");
-    return `<button class="item" data-play="${esc(p.id)}" aria-current="${p.id === S.sel}"><span class="nm">${esc(p.name)}</span><span class="side ${p.side[0]}">${p.side === "defense" ? "D" : "O"}</span>
+    return `<button class="item" data-play="${esc(p.id)}" aria-current="${p.id === S.sel}"><span class="nm">${esc(p.name)}</span><span class="side ${p.side[0]}">${p.side === "defense" ? "Def" : "Off"}</span>
       <span class="meta"><span>${esc(p.category || (p.side === "defense" ? "Defense" : "Offense"))} · ${p.steps.length} step${p.steps.length === 1 ? "" : "s"}</span>${p.example ? `<span class="tag-ex">Example</span>` : ""}${st}</span></button>`;
   }).join("");
 }
@@ -583,12 +633,14 @@ function setMode(m) {
   if (m !== "quiz") S.quiz = null;
   if (m !== "edit") S.edit = null;
   S.mode = m;
-  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === m)));
+  renderHeader();
   renderStage();
+  if (m !== "plays") window.scrollTo({ top: 0 });
 }
 function renderStage() {
   if (S.mode === "edit") renderEdit();
   else if (S.mode === "import") renderImport();
+  else if (S.mode === "coach") renderCoach();
   else if (S.mode === "quiz") renderQuiz();
   else renderStudy();
   showTrace();
@@ -634,20 +686,23 @@ function renderStudyPanel(play) {
   const note = i === 0 ? `<span class="num">Setup</span>${esc(play.summary || "Everyone in their starting spots.")}` : `<span class="num">${i}</span>${esc(play.steps[i - 1].note || "")}`;
   $("#panel").innerHTML = `
     <div><div class="sub"><span class="side ${play.side[0]}">${play.side}</span>${esc(play.category)}${play.example ? `<span class="tag-ex">Example</span>` : ""}</div><h2>${esc(play.name)}</h2></div>
+    <div class="iplay"><label class="lbl" for="mePick">I play</label>${myPosSelect(play, "mePick", true)}</div>
     <div class="steps" role="group" aria-label="Steps">${["Set"].concat(play.steps.map((_, k) => k + 1)).map((l, k) => `<button data-step="${k}" aria-current="${k === i}" aria-label="${k ? "Step " + k : "Setup"}">${l}</button>`).join("")}</div>
-    <div class="controls">
-      <button class="btn icon" data-act="restart" aria-label="Back to setup">${ICON.restart}</button>
-      <button class="btn icon" data-act="prev" aria-label="Previous step" ${i === 0 ? "disabled" : ""}>${ICON.prev}</button>
+    <div class="transport">
+      <button class="btn" data-act="restart" aria-label="Back to setup">${ICON.restart}</button>
+      <button class="btn" data-act="prev" aria-label="Previous step" ${i === 0 ? "disabled" : ""}>${ICON.prev}</button>
       <button class="btn primary" data-act="play" ${N ? "" : "disabled"}>${S.playing ? ICON.pause + "Pause" : ICON.play + (i === N && N ? "Replay" : "Play")}</button>
-      <button class="btn icon" data-act="next" aria-label="Next step" ${i >= N ? "disabled" : ""}>${ICON.next}</button>
-      <select class="inline" id="speed" aria-label="Speed" style="width:auto">${[.5, 1, 1.5].map(v => `<option value="${v}" ${v == S.speed ? "selected" : ""}>${v}×</option>`).join("")}</select>
+      <button class="btn" data-act="next" aria-label="Next step" ${i >= N ? "disabled" : ""}>${ICON.next}</button>
     </div>
     <div class="note">${note}</div>
-    <div class="field"><label class="lbl" for="mePick">I play</label>${myPosSelect(play, "mePick", true)}</div>
     ${me && play.roles[me] ? `<div class="role"><div class="lbl">Your job as ${me}</div>${esc(play.roles[me])}</div>` : ""}
-    <hr class="sep">${legend()}
-    <hr class="sep">${gifSection(play)}
-    <p class="hint">Tip: use ← and → to step through, space to play.</p>`;
+    <details class="more" ${S.gif && S.gif.playId === play.id ? "open" : ""}><summary>Speed, diagram key and save as GIF</summary><div class="inner">
+      <div class="iplay"><label class="lbl" for="speed">Speed</label><select class="inline" id="speed" style="width:auto">${[.5, 1, 1.5].map(v => `<option value="${v}" ${v == S.speed ? "selected" : ""}>${v}×</option>`).join("")}</select></div>
+      ${legend()}
+      ${gifSection(play)}
+    </div></details>
+    <p class="hint desk-only">Tip: use ← and → to step through, space to play.</p>
+    <p class="hint phone-hint">Swipe the court left or right to change steps.</p>`;
   if (i === N && N > 0 && !S.progress[play.id]?.studied) { prog(play.id).studied = true; saveProgress() }
 }
 function goStep(n) {
@@ -792,7 +847,7 @@ function renderName() {
   $("#panel").innerHTML = `<div><div class="sub">Name that play · ${q.right} of ${q.total} right</div><h2>Which play is this?</h2></div>
     <div class="choices">${names.map(p => {
       const cls = q.answer ? (p.id === q.playId ? "right" : p.id === q.answer ? "wrong" : "") : "";
-      return `<button class="btn ${cls}" data-guess="${esc(p.id)}" ${q.answer ? "disabled" : ""}><span class="side ${p.side[0]}">${p.side === "defense" ? "D" : "O"}</span>${esc(p.name)}</button>`;
+      return `<button class="btn ${cls}" data-guess="${esc(p.id)}" ${q.answer ? "disabled" : ""}><span class="side ${p.side[0]}">${p.side === "defense" ? "Def" : "Off"}</span>${esc(p.name)}</button>`;
     }).join("")}</div>
     ${q.answer ? `<div class="result ${q.answer === q.playId ? "good" : "bad"}">${q.answer === q.playId ? "Correct." : "Not that one. The right answer is highlighted."}</div>` : ""}
     <div class="controls">${q.answer ? `<button class="btn primary" data-act="namequiz">Next play</button>` : ""}<button class="btn" data-act="replayname">Replay</button><button class="btn" data-act="quitquiz">Quiz menu</button></div>`;
@@ -808,8 +863,7 @@ function openEditor(play) {
   S.edit = { draft: play ? clone(play) : newDraft(), isNew: !play, step: 0, confirm: false };
   if (play) S.edit.draft.example = false;
   S.mode = "edit";
-  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.mode === "edit")));
-  renderEdit(); showTrace();
+  renderHeader(); renderEdit(); showTrace(); window.scrollTo({ top: 0 });
 }
 function traceControls() {
   if (!S.trace) return `<div class="field"><label class="lbl" for="traceFile">Diagram to trace (optional)</label><input type="file" id="traceFile" accept="image/*"><span class="hint">Show a play diagram from a website or book under the court, then drag players on top of it.</span></div>`;
@@ -848,7 +902,7 @@ function renderEdit() {
       <div class="controls"><button class="btn danger" data-act="delstep">Delete step ${k}</button></div>`;
   }
   const roleIds = sideIds(d);
-  $("#panel").innerHTML = `<div><div class="sub">${E.isNew ? "New play" : "Editing"}</div><h2>${esc(d.name || "Untitled play")}</h2></div>
+  $("#panel").innerHTML = `<button class="back" data-act="cancel">← Coach</button><div><div class="sub">${E.isNew ? "New play" : "Editing"}</div><h2>${esc(d.name || "Untitled play")}</h2></div>
     <div class="field"><label class="lbl" for="eName">Play name</label><input id="eName" value="${esc(d.name)}" placeholder="e.g. Horns Flare"></div>
     <div class="row2"><div class="field"><label class="lbl" for="eSide">Side</label><select id="eSide"><option value="offense" ${d.side === "offense" ? "selected" : ""}>Offense</option><option value="defense" ${d.side === "defense" ? "selected" : ""}>Defense</option></select></div>
     <div class="field"><label class="lbl" for="eCat">Category</label><input id="eCat" value="${esc(d.category)}" placeholder="e.g. Inbound"></div></div>
@@ -860,7 +914,7 @@ function renderEdit() {
     <hr class="sep">
     <div class="controls"><button class="btn primary" data-act="save">Save play</button><button class="btn" data-act="cancel">Cancel</button>
     ${E.isNew ? "" : E.confirm ? `<button class="btn danger solid" data-act="delyes">Yes, delete</button>` : `<button class="btn danger" data-act="del">Delete play</button>`}</div>
-    <p class="hint">Saved plays stay on this device until you download plays.json and upload it to the site.</p>`;
+    <p class="hint">Saving keeps the play on this device. Publish from the Coach screen to send it to your team.</p>`;
 }
 function toggleTok(t, on) {
   const d = S.edit.draft;
@@ -881,13 +935,13 @@ function savePlay() {
   if (i >= 0) plays[i] = clean; else plays.push(clean);
   commitLocal(plays);
   S.sel = d.id; store.set("sel", S.sel); S.edit = null; S.step = 0;
-  toast(`Saved "${d.name}" on this device.`); renderList(); setMode("study");
+  toast(`Saved "${d.name}". Publish it when you're ready.`); renderList(); setMode("coach");
 }
 function deletePlay() {
   const d = S.edit.draft;
   commitLocal(S.plays.filter(p => p.id !== d.id));
   toast(`Deleted "${d.name}".`);
-  S.edit = null; S.sel = S.plays[0]?.id || null; renderList(); setMode("study");
+  S.edit = null; S.sel = S.plays[0]?.id || null; renderList(); setMode("coach");
 }
 
 /* ---------- import (coach) ---------- */
@@ -913,7 +967,7 @@ function renderImport() {
   const play = curPlay();
   if (play) { const sts = buildStates(play); scene(play, { pos: sts[0].pos, ball: sts[0].ball, paths: [] }) } else emptyStage("");
   $("#capR").textContent = "";
-  $("#panel").innerHTML = `<h2>Import plays</h2>
+  $("#panel").innerHTML = `<button class="back" data-mode="coach">← Coach</button><h2>Import plays</h2>
     <div class="cards">
       <div class="card"><h3>From a play file</h3>
         <p>Add plays from a Chalk Talk file (.json) another coach sent you, or paste play code from an AI assistant.</p>
@@ -930,8 +984,8 @@ function renderImport() {
         <div class="controls"><button class="btn" data-act="copyprompt">Copy instructions</button></div>
         <details><summary class="hint" style="cursor:pointer">Show the instructions</summary><textarea class="code" id="promptText" rows="8" readonly style="width:100%;margin-top:6px">${esc(AI_PROMPT)}</textarea></details>
       </div>
-      <div class="card"><h3>Share the playbook</h3>
-        <p>Download every play as plays.json. Upload it to the website to publish your changes, or send it to another coach.</p>
+      <div class="card"><h3>Send plays to another coach</h3>
+        <p>Download every play as one file they can import.</p>
         <button class="btn" data-act="export" ${S.plays.length ? "" : "disabled"}>Download plays.json</button>
       </div>
     </div>`;
@@ -946,7 +1000,89 @@ function importPlays(text, label) {
   commitLocal(plays);
   S.sel = good[0].id; store.set("sel", S.sel); S.step = 0;
   toast([added && `Added ${added} play${added > 1 ? "s" : ""}`, updated && `updated ${updated}`, bad && `skipped ${bad} that couldn't be read`].filter(Boolean).join(", ") + ".");
-  renderList(); setMode("study");
+  renderList(); setMode("coach");
+}
+
+/* ---------- coach home and publishing to GitHub ---------- */
+function guessRepo() {
+  const m = location.hostname.match(/^([\w-]+)\.github\.io$/), first = location.pathname.split("/").filter(Boolean)[0];
+  return m ? `${m[1]}/${first && !first.includes(".") ? first : m[1] + ".github.io"}` : "";
+}
+S.gh = Object.assign({ repo: guessRepo(), token: "" }, store.get("gh", {}));
+const ghReady = () => !!(S.gh.token && /^[\w.-]+\/[\w.-]+$/.test(S.gh.repo));
+function ghFetch(path, opts = {}) {
+  return fetch(`https://api.github.com/repos/${S.gh.repo}${path}`, { ...opts, headers: { Authorization: `Bearer ${S.gh.token}`, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } });
+}
+function b64(s) { const b = new TextEncoder().encode(s); let bin = ""; for (let i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode(...b.subarray(i, i + 0x8000)); return btoa(bin) }
+const ghError = status => status === 401 ? "GitHub didn't accept that access key. It may have expired or been copied wrong. Paste a new one in Coach → Publishing." :
+  status === 403 ? "This access key can't change the repository. Make a new key with Contents set to Read and write." :
+  status === 404 ? "GitHub can't find that repository with this key. Check the repository name, and that the key includes it." :
+  "Couldn't reach GitHub. Check your connection and try again.";
+async function connectGitHub() {
+  const repo = $("#ghRepo").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\.git$|\/$/g, ""), token = $("#ghToken").value.trim();
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) { toast("Enter the repository as owner/name, like alexvinzant-ops/Chalk-Talk."); return }
+  if (!token) { toast("Paste your access key first."); return }
+  const prev = S.gh; S.gh = { repo, token };
+  let r; try { r = await ghFetch("/contents/plays.json") } catch { r = { status: 0 } }
+  if (r.ok || r.status === 404 && (await ghFetch("")).ok) {
+    store.set("gh", S.gh); S.ghEdit = false; toast("Connected. You can publish with one tap now."); renderHeader(); renderCoach();
+  } else { S.gh = prev; toast(ghError(r.status)) }
+}
+async function publish() {
+  if (!ghReady() || S.publishing) return;
+  S.publishing = true; renderHeader(); if (S.mode === "coach") renderCoach();
+  const content = JSON.stringify({ app: "chalk-talk", version: 1, publishedAt: new Date().toISOString(), plays: S.plays.map(toDoc) }, null, 1);
+  let msg = null;
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const g = await ghFetch("/contents/plays.json?t=" + Date.now());
+      if (!g.ok && g.status !== 404) { msg = ghError(g.status); break }
+      const sha = g.ok ? (await g.json()).sha : undefined;
+      const r = await ghFetch("/contents/plays.json", { method: "PUT", body: JSON.stringify({ message: `Update playbook (${S.plays.length} plays)`, content: b64(content), sha }) });
+      if (r.ok) { msg = ""; break }
+      if (r.status !== 409) { msg = ghError(r.status); break }
+    }
+  } catch { msg = ghError(0) }
+  S.publishing = false;
+  if (msg === "") {
+    S.sitePlays = clone(S.plays); store.del("localPlaybook"); S.localDirty = false;
+    toast("Published. Players will see the new plays in about a minute.");
+  } else toast(msg || "Couldn't publish. Try again.");
+  renderHeader(); renderList(); if (S.mode === "coach") renderCoach();
+}
+function renderCoach() {
+  const play = curPlay();
+  if (play) { const sts = buildStates(play); scene(play, { pos: sts[0].pos, ball: sts[0].ball, paths: [] }) } else emptyStage("");
+  $("#capR").textContent = "";
+  const ready = ghReady(), showSetup = !ready || S.ghEdit;
+  const status = S.localDirty
+    ? `<div class="status pending"><b>You have changes players can't see yet.</b>${ready ? `<button class="btn primary" data-act="publish" ${S.publishing ? "disabled" : ""}>${S.publishing ? "Publishing…" : "Publish to team"}</button>` : `<span>Set up publishing below so you can send them with one tap.</span>`}</div>`
+    : `<div class="status ok"><b>Everything is published.</b><span>Players see the same plays you do.</span></div>`;
+  const setup = showSetup ? `<div class="card"><h3>Set up publishing</h3>
+      <p>Do this once on each phone or computer you coach from. It lets this app update your team's site for you.</p>
+      <ol class="howto">
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub's new access key page</a> and sign in if asked.</li>
+        <li>Name it <b>Chalk Talk</b> and pick an expiration, like 1 year.</li>
+        <li>Under <b>Repository access</b>, choose <b>Only select repositories</b>, then pick your Chalk Talk repository.</li>
+        <li>Under <b>Permissions</b>, add <b>Contents</b> and set it to <b>Read and write</b>.</li>
+        <li>Choose <b>Generate token</b>, copy it, and paste it below.</li>
+      </ol>
+      <div class="field"><label class="lbl" for="ghRepo">Repository</label><input id="ghRepo" value="${esc(S.gh.repo)}" placeholder="owner/name" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label class="lbl" for="ghToken">Access key</label><input id="ghToken" type="password" autocomplete="off" placeholder="github_pat_…" spellcheck="false"></div>
+      <div class="controls"><button class="btn primary" data-act="ghconnect">Connect</button>${ready ? `<button class="btn" data-act="ghcancel">Cancel</button>` : ""}</div>
+      <p class="hint">The key is saved only in this browser. Anyone using this device could publish, so only set it up on your own phone or computer.</p></div>`
+    : `<div class="card"><h3>Publishing</h3><p>Connected to <b>${esc(S.gh.repo)}</b>.</p><div class="controls"><button class="btn" data-act="ghchange">Change</button><button class="btn danger" data-act="ghforget">Disconnect this device</button></div></div>`;
+  $("#panel").innerHTML = `<h2>Coach</h2>${status}
+    <div class="bigbtns">
+      <button class="btn primary" data-act="new">Draw a new play<small>Drag players on a blank court</small></button>
+      ${play ? `<button class="btn" data-act="editcur">Edit ${esc(play.name)}<small>Change spots, steps and notes</small></button>` : ""}
+      <button class="btn" data-mode="import">Import a play<small>From a screenshot, a file or an AI assistant</small></button>
+    </div>
+    ${setup}
+    <details class="more"><summary>More</summary><div class="inner">
+      <div class="controls"><button class="btn" data-act="export" ${S.plays.length ? "" : "disabled"}>Download plays.json</button><button class="btn" data-act="coachoff">Turn off coach tools</button></div>
+      <p class="hint">Turning off coach tools shows this device the published plays, like your players see them.</p>
+    </div></details>`;
 }
 
 /* ---------- GIF export ---------- */
@@ -1098,7 +1234,7 @@ document.addEventListener("click", e => {
   if (t.dataset.filter) { S.filter = t.dataset.filter; store.set("filter", S.filter); renderList(); return }
   if (t.dataset.play) {
     S.sel = t.dataset.play; store.set("sel", S.sel); S.step = 0; S.gif = null; renderList();
-    if (S.mode === "edit") openEditor(curPlay()); else setMode(S.mode === "quiz" ? "quiz" : S.mode === "import" ? "import" : "study");
+    if (S.mode === "edit") openEditor(curPlay()); else setMode(["quiz", "import", "coach"].includes(S.mode) ? S.mode : "study");
     return;
   }
   if (t.dataset.mode) { if (t.dataset.mode === "edit") openEditor(curPlay()); else setMode(t.dataset.mode); return }
@@ -1119,7 +1255,7 @@ document.addEventListener("click", e => {
     new: () => openEditor(null),
     addstep: () => { const d = S.edit.draft; d.steps.splice(S.edit.step, 0, { note: "", pass: null, moves: {} }); S.edit.step++; renderEdit() },
     delstep: () => { const d = S.edit.draft; d.steps.splice(S.edit.step - 1, 1); S.edit.step = Math.min(S.edit.step, d.steps.length); renderEdit() },
-    save: savePlay, cancel: () => { S.edit = null; setMode("study") },
+    save: savePlay, cancel: () => { S.edit = null; setMode("coach") },
     del: () => { S.edit.confirm = true; renderEdit() }, delyes: deletePlay,
     untrace: () => { S.trace = null; renderEdit(); showTrace() },
     export: exportPlaybook,
@@ -1132,16 +1268,22 @@ document.addEventListener("click", e => {
     },
     gif: () => { const p = curPlay(); if (p) makeGif(p) },
     closegif: () => { S.gif = null; renderStudyPanel(curPlay()) },
-    sharegif: () => { const g = S.gif; navigator.share({ files: [g.file], title: curPlay()?.name }).catch(() => {}) }
+    sharegif: () => { const g = S.gif; navigator.share({ files: [g.file], title: curPlay()?.name }).catch(() => {}) },
+    editcur: () => openEditor(curPlay()),
+    publish, ghconnect: connectGitHub,
+    ghchange: () => { S.ghEdit = true; renderCoach() }, ghcancel: () => { S.ghEdit = false; renderCoach() },
+    ghforget: () => { S.gh = { repo: S.gh.repo, token: "" }; store.set("gh", S.gh); toast("This device can't publish anymore."); renderHeader(); renderCoach() },
+    coachoff: () => setCoach(false)
   })[act]?.();
 });
 $("#newBtn").addEventListener("click", () => openEditor(null));
-$("#coachToggle").addEventListener("click", () => {
-  S.coach = !S.coach; store.set("coach", S.coach);
-  if (S.coach) { const local = store.get("localPlaybook", null); if (local) { S.plays = parsePlaybook(local).filter(Boolean); S.localDirty = true; sortPlays() } toast("Coach tools on. Changes stay on this device until you publish them.") }
+function setCoach(on) {
+  S.coach = on; store.set("coach", on);
+  if (on) { const local = store.get("localPlaybook", null); if (local) { S.plays = parsePlaybook(local).filter(Boolean); S.localDirty = true; sortPlays() } toast("Coach tools on. Changes stay on this device until you publish them.") }
   else { S.plays = clone(S.sitePlays); S.localDirty = false; sortPlays(); if (!curPlay()) S.sel = S.plays[0]?.id || null }
-  renderHeader(); renderList(); setMode("study");
-});
+  renderList(); setMode(on ? "coach" : "study");
+}
+$("#coachToggle").addEventListener("click", () => setCoach(true));
 $("#q").addEventListener("input", e => { S.q = e.target.value; renderList() });
 document.addEventListener("change", e => {
   const t = e.target, play = curPlay();
@@ -1173,7 +1315,7 @@ document.addEventListener("input", e => {
   else if (t.dataset.role) d.roles[t.dataset.role] = t.value;
 });
 document.addEventListener("paste", e => {
-  if (!S.coach || (S.mode !== "import" && S.mode !== "edit")) return;
+  if (!S.coach || !["import", "edit", "coach"].includes(S.mode)) return;
   const item = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith("image/"));
   if (item) { e.preventDefault(); loadTrace(item.getAsFile()) }
 });
@@ -1190,7 +1332,7 @@ function toast(msg) { const el = $("#toast"); el.textContent = msg; el.hidden = 
 function sortPlays() { S.plays.sort((a, b) => b.side.localeCompare(a.side) || a.name.localeCompare(b.name)) }
 async function boot() {
   let site = null;
-  try { const r = await fetch("plays.json", { cache: "no-cache" }); if (r.ok) site = parsePlaybook(await r.json()).filter(Boolean) } catch {}
+  try { const r = await fetch("plays.json?v=" + Date.now(), { cache: "no-store" }); if (r.ok) site = parsePlaybook(await r.json()).filter(Boolean) } catch {}
   S.siteMissing = !site;
   S.sitePlays = site || STARTER.map(p => normPlay(p.id, p));
   const local = S.coach ? store.get("localPlaybook", null) : null;

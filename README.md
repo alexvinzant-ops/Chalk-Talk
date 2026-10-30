@@ -19,13 +19,18 @@ A basketball playbook your players can open in any browser, with no account. The
 
 ## For the coach: adding and changing plays
 
-1. Open the site and choose **Turn on coach tools** at the bottom of the page. This only affects your browser.
-2. Draw plays in the **Edit** tab, or bring them in from the **Import** tab:
-   - **From a play file:** add a `.json` file another coach sent you, or paste play code.
+1. Open the site and choose **I'm a coach** at the bottom of the page. A **Coach** tab appears. This only affects your browser.
+2. In the Coach tab, choose **Draw a new play**, **Edit**, or **Import a play**:
    - **Trace a diagram:** take a screenshot of a play from a website or PDF and choose it, or paste it with Ctrl+V. It shows under the court so you can drag players on top of it.
    - **Use an AI assistant:** copy the instructions, give them to Claude with the play's description or diagram, and paste the answer back into the box.
-3. Your changes are saved on your device only. To publish them, choose **Download plays.json**.
-4. Upload the new `plays.json` to the GitHub repository (**Add file → Upload files**, then **Commit changes**). The site updates for everyone within a minute or two.
+   - **From a play file:** add a `.json` file another coach sent you.
+3. Saved changes stay on your device until you tap **Publish to team**. Players see them about a minute later.
+
+### Setting up Publish (once per device)
+
+The Coach tab walks you through it: create a GitHub access key that can only change this repository (Contents: Read and write), then paste it in. The key is stored only in that browser, so only set it up on your own phone or computer. If the key expires, make a new one and paste it in the same place.
+
+Without a key you can still publish by hand: choose **More → Download plays.json** and upload it to the repository (**Add file → Upload files**, then **Commit changes**).
 
 The page also works on its own: if `plays.json` is missing, it shows five example plays.
 
