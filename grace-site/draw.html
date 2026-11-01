@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Grace Christian • Draw a Play</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=Permanent+Marker&display=swap">
+<style>
+/* Layout: one-screen phone app. Header, square whiteboard court, step strip, tool rows. */
+:root {
+  /* Grace Christian green and gold, matching the team playbook page */
+  --bg: #f3f5ef;
+  --panel: #ffffff;
+  --ink: #172c25;
+  --muted: #56675e;
+  --line: #d9e1da;
+  --accent: #0c4d31;
+  --accent-ink: #ffffff;
+  --chip: #eef2ea;
+  --gold: #dcb74c;
+  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-marker: "Permanent Marker", "Comic Sans MS", cursive;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1a15; --panel: #16241d; --ink: #e8efe9; --muted: #9aaba1;
+    --line: #2a3b32; --accent: #dcb74c; --accent-ink: #123d2c; --chip: #1d2e25;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1a15; --panel: #16241d; --ink: #e8efe9; --muted: #9aaba1;
+  --line: #2a3b32; --accent: #dcb74c; --accent-ink: #123d2c; --chip: #1d2e25;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+html { box-sizing: border-box; padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px); }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior: none;
+}
+button, input { font: inherit; color: inherit; }
+button { touch-action: manipulation; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app {
+  height: 100%; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px;
+  padding-block: 10px 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+}
+.top { display: flex; align-items: center; gap: 10px; }
+.back {
+  flex: none; padding: 7px 12px; border-radius: 999px; background: var(--gold); color: #123d2c;
+  font-family: var(--font-display); font-weight: 700; font-size: 16px; text-decoration: none; text-transform: uppercase; letter-spacing: .04em;
+}
+.back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.top input {
+  flex: 1; min-width: 0; border: 0; background: transparent; padding: 4px 0;
+  font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: .01em;
+  text-transform: uppercase; border-bottom: 2px solid transparent;
+}
+.top input:focus { outline: none; border-bottom-color: var(--accent); }
+.btn {
+  border: 1px solid var(--line); background: var(--panel); border-radius: 10px;
+  padding: 9px 12px; font-family: var(--font-display); font-weight: 600; font-size: 16px;
+  letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.board-wrap { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.board {
+  border-radius: 6px; background: #fbfbf8; box-shadow: 0 0 0 6px #2d3338, 0 8px 24px rgba(0,0,0,.25);
+  max-width: 100%; touch-action: none;
+}
+.board canvas { display: block; touch-action: none; border-radius: 6px; }
+.hint { margin: 0; min-height: 2.6em; color: var(--muted); font-size: 14px; line-height: 1.3; text-align: center; text-wrap: balance; }
+
+.steps { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.steps::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none; min-width: 44px; height: 40px; border-radius: 20px; border: 1px solid var(--line);
+  background: var(--chip); font-family: var(--font-display); font-weight: 700; font-size: 16px;
+  letter-spacing: .04em; text-transform: uppercase; padding: 0 14px;
+}
+.chip.sel { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip.add { border-style: dashed; background: transparent; color: var(--accent); border-color: var(--accent); }
+.row { display: flex; gap: 8px; }
+.row .btn { flex: 1; padding-inline: 6px; }
+.row .btn.big { flex: 1.4; font-size: 18px; padding-block: 12px; }
+
+.sheet {
+  position: fixed; inset: 0; z-index: 20; background: rgba(5,10,15,.55); display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet-card {
+  background: var(--panel); width: 100%; max-width: 560px; max-height: 86%; overflow: auto; box-sizing: border-box;
+  border-radius: 18px 18px 0 0; display: flex; flex-direction: column; gap: 14px;
+  padding-block: 18px calc(18px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+}
+.sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sheet-head h2 { margin: 0; font-family: var(--font-display); font-size: 24px; text-transform: uppercase; letter-spacing: .03em; }
+.plays { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.plays li { display: flex; gap: 8px; align-items: stretch; }
+.plays .open {
+  flex: 1; min-width: 0; text-align: left; border: 1px solid var(--line); background: var(--chip); border-radius: 10px; padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.plays .open.cur { border-color: var(--accent); }
+.plays .open b { font-family: var(--font-display); font-size: 18px; text-transform: uppercase; letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plays .open span { color: var(--muted); font-size: 13px; }
+.plays .del { border: 1px solid var(--line); background: transparent; border-radius: 10px; padding: 0 12px; color: var(--muted); font-size: 13px; }
+.plays .del.armed { background: #c62f2f; border-color: #c62f2f; color: #fff; }
+.find-input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--chip); border-radius: 10px; padding: 9px 12px; }
+.store-note { margin: 0; color: var(--muted); font-size: 13px; }
+.gif-box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.gif-box img { width: 100%; max-width: 420px; border-radius: 6px; -webkit-touch-callout: default; }
+.progress { width: 100%; height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .1s; }
+.gif-status { margin: 0; color: var(--muted); font-size: 14px; text-align: center; }
+@media (prefers-reduced-motion: reduce) { .progress i { transition: none; } }
+</style>
+
+<div class="app">
+  <header class="top">
+    <a class="back" href="./">‹ Team</a>
+    <input id="playName" aria-label="Play name" maxlength="40" autocomplete="off">
+    <button class="btn" id="playsBtn">Playbook</button>
+  </header>
+  <div class="board-wrap" id="wrap"><div class="board"><canvas id="cv" aria-label="Court diagram"></canvas></div></div>
+  <p class="hint" id="hint"></p>
+  <div class="steps" id="steps" role="tablist" aria-label="Steps"></div>
+  <div class="row">
+    <button class="btn" id="undoBtn">Undo</button>
+    <button class="btn" id="defBtn">Defense</button>
+    <button class="btn" id="delStepBtn">Remove step</button>
+  </div>
+  <div class="row">
+    <button class="btn" id="speedBtn">Normal</button>
+    <button class="btn big" id="playBtn">▶ Play</button>
+    <button class="btn big primary" id="gifBtn">Make GIF</button>
+  </div>
+</div>
+
+<div class="sheet" id="playsSheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Playbook</h2><button class="btn" id="closePlays">Done</button></div>
+    <div class="row">
+      <button class="btn primary" id="newPlayBtn">+ New play</button>
+      <button class="btn" id="findBtn" hidden>Find a play</button>
+    </div>
+    <ul class="plays" id="playsList"></ul>
+    <p class="store-note" id="storeNote"></p>
+  </div>
+</div>
+
+<div class="sheet" id="gifSheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Your GIF</h2><button class="btn" id="closeGif">Done</button></div>
+    <div class="gif-box">
+      <div class="progress" id="gifProg"><i></i></div>
+      <img id="gifImg" alt="Animated play" hidden>
+      <p class="gif-status" id="gifStatus">Drawing frames…</p>
+      <button class="btn primary" id="saveGif" hidden>Save GIF</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="findSheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Find a play</h2><button class="btn" id="closeFind">Done</button></div>
+    <form class="row" id="findForm">
+      <input id="findQ" class="find-input" placeholder="Horns, Flex, UCLA cut, zone offense…" autocomplete="off" aria-label="Play to find">
+      <button class="btn primary" id="findGo">Search</button>
+    </form>
+    <ul class="plays" id="findList"></ul>
+    <p class="store-note" id="findStatus">Claude suggests well-known plays from its basketball knowledge and draws the one you pick. Check the drawing before you teach it.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+// ---------- court geometry (feet; basket at top, half-court line at y=47) ----------
+const CW = 50, CH = 47, MX = 2, MT = 2, MB = 5;
+const WW = CW + MX * 2, WH = CH + MT + MB;       // 54 x 54 world
+const R = 1.9;                                     // player radius
+const BASKET = [25, 5.25];
+const OFF = ['o1', 'o2', 'o3', 'o4', 'o5'], DEF = ['x1', 'x2', 'x3', 'x4', 'x5'];
+const COL = { board: '#fbfbf8', court: '#93a6ba', lane: 'rgba(147,166,186,.10)', ink: '#18222c', def: '#c62f2f', ball: '#e8742a', ballEdge: '#a8461a' };
+const SPEEDS = [['Slow', 1.6], ['Normal', 1], ['Fast', 0.65]];
+
+const $ = id => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d');
+const newId = () => 'p' + Math.random().toString(36).slice(2, 10);
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const clamp01 = t => Math.max(0, Math.min(1, t));
+const clonePos = p => Object.fromEntries(Object.entries(p).map(([k, v]) => [k, v.slice()]));
+const cloneStep = s => ({ pos: clonePos(s.pos), ball: s.ball, screens: {} });
+
+function guard(p) { // defender spot: 3.5ft from the offensive player toward the basket
+  const d = dist(p, BASKET) || 1, k = Math.min(3.5, d - 1) / d;
+  return [p[0] + (BASKET[0] - p[0]) * k, p[1] + (BASKET[1] - p[1]) * k];
+}
+function formation() {
+  const o = { o1: [25, 32], o2: [42, 22], o3: [8, 22], o4: [33, 10], o5: [17, 10] };
+  const pos = { ...o };
+  OFF.forEach((k, i) => pos[DEF[i]] = guard(o[k]));
+  return pos;
+}
+function newPlay(name) {
+  return { id: newId(), name: name || 'New Play', showDefense: true, steps: [{ pos: formation(), ball: 'o1', screens: {} }], updated: Date.now() };
+}
+function samplePlay() {
+  const p = newPlay('High Pick & Roll');
+  const s0 = p.steps[0];
+  const s1 = cloneStep(s0); s1.pos.o5 = [29.6, 28.4]; s1.pos.x5 = [24, 24]; s1.screens = { o5: true };
+  const s2 = cloneStep(s1); s2.pos.o1 = [37, 23.5]; s2.pos.x1 = [34.5, 21]; s2.pos.o5 = [23.5, 11]; s2.pos.x5 = [31, 21];
+  s2.pos.o2 = [46.5, 3.5]; s2.pos.x2 = [43.5, 6.5];
+  const s3 = cloneStep(s2); s3.ball = 'o5'; s3.pos.x4 = [28.5, 13];
+  p.steps.push(s1, s2, s3);
+  return p;
+}
+
+// ---------- state ----------
+const library = new Map();
+let play, cur = 0, undoStack = [], speedIdx = 1;
+let drag = null, anim = null, hintOverride = null, hintTimer = 0;
+
+// ---------- storage: your private cloud rows when signed in, browser storage as backup ----------
+const store = { coll: null };
+const LKEY = 'chalktalk.plays.v1';
+function readLocal() { try { return JSON.parse(localStorage.getItem(LKEY) || '[]'); } catch { return []; } }
+function writeLocal() { try { localStorage.setItem(LKEY, JSON.stringify([...library.values()])); } catch {} }
+function merge(list) {
+  for (const p of list) {
+    if (!p || !p.id || !Array.isArray(p.steps)) continue;
+    const have = library.get(p.id);
+    if (!have || (p.updated || 0) > (have.updated || 0)) library.set(p.id, p);
+  }
+}
+let saveTimer = 0;
+function save() {
+  play.updated = Date.now();
+  library.set(play.id, play);
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    writeLocal();
+    if (store.coll) store.coll.doc(play.id).set({ name: play.name, json: JSON.stringify(play), updated: play.updated }).catch(e => console.warn('save failed', e));
+  }, 500);
+}
+function removePlay(id) {
+  library.delete(id); writeLocal();
+  if (store.coll) store.coll.doc(id).delete().catch(() => {});
+}
+function mostRecent() { return [...library.values()].sort((a, b) => (b.updated || 0) - (a.updated || 0))[0]; }
+async function initCloud() {
+  try {
+    if (!window.claude || !window.claude.use) return;
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    const uid = user ? await user.id() : null;
+    if (!db || !uid) return;
+    store.coll = db.collection('data/users/' + uid);
+    const snap = await store.coll.get();
+    const before = play.updated;
+    merge(snap.docs.map(d => { try { return JSON.parse(d.data().json); } catch { return null; } }));
+    // push anything that only lived in this browser up to the cloud
+    for (const p of library.values()) if (!snap.docs.some(d => d.id === p.id) && !p.unsaved) store.coll.doc(p.id).set({ name: p.name, json: JSON.stringify(p), updated: p.updated }).catch(() => {});
+    if (play.unsaved && snap.docs.length) { library.delete(play.id); openPlay(mostRecent().id); }
+    else if (library.get(play.id) && library.get(play.id).updated > before) openPlay(play.id);
+    renderPlays();
+  } catch (e) { console.warn('cloud storage unavailable', e); }
+}
+
+// ---------- derived movement for a step ----------
+function movesFor(k) {
+  if (k <= 0) return { moves: [], pass: null };
+  const a = play.steps[k - 1], b = play.steps[k], moves = [];
+  for (const p of [...OFF, ...DEF]) {
+    if (DEF.includes(p) && !play.showDefense) continue;
+    if (dist(a.pos[p], b.pos[p]) < 0.5) continue;
+    const type = DEF.includes(p) ? 'def' : b.screens[p] ? 'screen' : a.ball === p ? 'dribble' : 'cut';
+    moves.push({ p, from: a.pos[p], to: b.pos[p], type });
+  }
+  const pass = a.ball !== b.ball ? { from: a.ball, to: b.ball } : null;
+  return { moves, pass };
+}
+
+// ---------- drawing ----------
+function drawCourt(c) {
+  c.fillStyle = COL.board; c.fillRect(-MX, -MT, WW, WH);
+  c.strokeStyle = COL.court; c.lineWidth = 0.24; c.lineCap = 'round'; c.setLineDash([]);
+  c.fillStyle = COL.lane; c.fillRect(19, 0, 12, 19);
+  c.strokeRect(0, 0, CW, CH);
+  c.strokeRect(19, 0, 12, 19);
+  c.beginPath(); c.arc(25, 19, 6, 0, Math.PI); c.stroke();
+  c.setLineDash([0.9, 0.9]); c.beginPath(); c.arc(25, 19, 6, Math.PI, Math.PI * 2); c.stroke(); c.setLineDash([]);
+  c.beginPath(); c.moveTo(5.25, 0); c.lineTo(5.25, 5.25); c.arc(25, 5.25, 19.75, Math.PI, 0, true); c.lineTo(44.75, 0); c.stroke();
+  for (const y of [7, 8, 11, 14]) { c.beginPath(); c.moveTo(19, y); c.lineTo(18.2, y); c.moveTo(31, y); c.lineTo(31.8, y); c.stroke(); }
+  c.beginPath(); c.arc(25, 47, 6, Math.PI, Math.PI * 2); c.stroke();
+  c.lineWidth = 0.4; c.beginPath(); c.moveTo(22, 4); c.lineTo(28, 4); c.stroke();
+  c.lineWidth = 0.24; c.beginPath(); c.moveTo(25, 4); c.lineTo(25, 4.5); c.stroke();
+  c.strokeStyle = COL.ballEdge; c.beginPath(); c.arc(25, 5.25, 0.75, 0, Math.PI * 2); c.stroke();
+}
+
+function zigzag(a, b) {
+  const L = dist(a, b), u = [(b[0] - a[0]) / L, (b[1] - a[1]) / L], n = [-u[1], u[0]];
+  const pts = [a], lead = 0.6, tail = Math.min(1.6, L * 0.3);
+  for (let s = lead; s < L - tail; s += 0.2) {
+    const o = 0.55 * Math.sin((s - lead) / 1.5 * Math.PI * 2);
+    pts.push([a[0] + u[0] * s + n[0] * o, a[1] + u[1] * s + n[1] * o]);
+  }
+  pts.push(b);
+  return pts;
+}
+function strokePartial(c, pts, frac) {
+  let total = 0; const seg = [];
+  for (let i = 1; i < pts.length; i++) { const d = dist(pts[i - 1], pts[i]); seg.push(d); total += d; }
+  let left = total * frac;
+  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  let tip = pts[0];
+  for (let i = 1; i < pts.length && left > 0; i++) {
+    const t = Math.min(1, left / seg[i - 1]);
+    tip = lerp(pts[i - 1], pts[i], t);
+    c.lineTo(tip[0], tip[1]);
+    left -= seg[i - 1];
+  }
+  c.stroke();
+  return tip;
+}
+function arrowHead(c, from, to) {
+  const ang = Math.atan2(to[1] - from[1], to[0] - from[0]), L = 1.35, w = 0.5;
+  c.setLineDash([]);
+  c.beginPath(); c.moveTo(to[0], to[1]);
+  c.lineTo(to[0] - L * Math.cos(ang - w), to[1] - L * Math.sin(ang - w));
+  c.lineTo(to[0] - L * Math.cos(ang + w), to[1] - L * Math.sin(ang + w));
+  c.closePath(); c.fill();
+}
+function drawLine(c, from, to, type, frac, startTrim, endTrim) {
+  const L = dist(from, to);
+  if (L < startTrim + endTrim + 0.6) return;
+  const u = [(to[0] - from[0]) / L, (to[1] - from[1]) / L];
+  const a = [from[0] + u[0] * startTrim, from[1] + u[1] * startTrim];
+  const b = [to[0] - u[0] * endTrim, to[1] - u[1] * endTrim];
+  const color = type === 'def' ? COL.def : COL.ink;
+  c.strokeStyle = color; c.fillStyle = color; c.lineCap = 'round'; c.lineJoin = 'round';
+  c.lineWidth = type === 'def' ? 0.2 : 0.3;
+  c.globalAlpha = type === 'def' ? 0.55 : 1;
+  c.setLineDash(type === 'pass' ? [0.8, 0.75] : type === 'def' ? [0.4, 0.5] : []);
+  const pts = type === 'dribble' ? zigzag(a, b) : [a, b];
+  strokePartial(c, pts, frac);
+  c.setLineDash([]);
+  if (frac >= 1 && type !== 'def') {
+    if (type === 'screen') {
+      c.lineWidth = 0.45; const n = [-u[1], u[0]];
+      c.beginPath(); c.moveTo(b[0] + n[0] * 1.6, b[1] + n[1] * 1.6); c.lineTo(b[0] - n[0] * 1.6, b[1] - n[1] * 1.6); c.stroke();
+    } else arrowHead(c, pts[pts.length - 2], b);
+  }
+  c.globalAlpha = 1;
+}
+function drawOffense(c, p, at, hl) {
+  if (hl) { c.fillStyle = 'rgba(223,90,27,.22)'; c.beginPath(); c.arc(at[0], at[1], R + 1.1, 0, Math.PI * 2); c.fill(); }
+  c.fillStyle = COL.board; c.strokeStyle = COL.ink; c.lineWidth = 0.32;
+  c.beginPath(); c.arc(at[0], at[1], R, 0, Math.PI * 2); c.fill(); c.stroke();
+  c.fillStyle = COL.ink; c.font = '2.3px "Permanent Marker", cursive'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(p[1], at[0], at[1] + 0.12);
+}
+function drawDefense(c, p, at, hl) {
+  if (hl) { c.fillStyle = 'rgba(198,47,47,.18)'; c.beginPath(); c.arc(at[0], at[1], R + 1.1, 0, Math.PI * 2); c.fill(); }
+  const s = 1.25;
+  c.strokeStyle = COL.def; c.lineWidth = 0.45; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(at[0] - s, at[1] - s); c.lineTo(at[0] + s, at[1] + s); c.moveTo(at[0] + s, at[1] - s); c.lineTo(at[0] - s, at[1] + s); c.stroke();
+  c.fillStyle = COL.def; c.font = '1.5px "Permanent Marker", cursive'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(p[1], at[0] + 1.75, at[1] + 1.15);
+}
+function drawBall(c, at) {
+  c.fillStyle = COL.ball; c.strokeStyle = COL.ballEdge; c.lineWidth = 0.15;
+  c.beginPath(); c.arc(at[0], at[1], 0.95, 0, Math.PI * 2); c.fill(); c.stroke();
+  c.lineWidth = 0.1; c.beginPath();
+  c.moveTo(at[0] - 0.95, at[1]); c.lineTo(at[0] + 0.95, at[1]);
+  c.moveTo(at[0], at[1] - 0.95); c.lineTo(at[0], at[1] + 0.95); c.stroke();
+}
+const ballSpot = p => [p[0] + 1.55, p[1] - 1.55];
+
+// Draws step k at progress t (0 = previous step's spots, 1 = this step's spots).
+function drawScene(c, k, t, opts = {}) {
+  drawCourt(c);
+  const step = play.steps[k], prev = play.steps[Math.max(0, k - 1)];
+  const mt = ease(t);
+  const posAt = p => k === 0 ? step.pos[p] : lerp(prev.pos[p], step.pos[p], mt);
+  const { moves, pass } = movesFor(k);
+  for (const m of moves) drawLine(c, m.from, m.to, m.type, mt, R * 1.05, R + 0.45);
+  // ball flies during the back part of the step
+  const bt = ease(clamp01((t - 0.35) / 0.65));
+  let ballAt;
+  if (pass) {
+    const a = posAt(pass.from), b = posAt(pass.to);
+    if (bt > 0) drawLine(c, a, b, 'pass', bt, R + 0.3, R + 0.5);
+    ballAt = bt <= 0 ? ballSpot(a) : lerp(ballSpot(a), ballSpot(b), bt);
+  } else ballAt = ballSpot(posAt(step.ball));
+  if (opts.ballAt) ballAt = opts.ballAt;
+  if (play.showDefense) for (const p of DEF) drawDefense(c, p, posAt(p), opts.hl === p);
+  for (const p of OFF) drawOffense(c, p, posAt(p), opts.hl === p);
+  drawBall(c, ballAt);
+  // caption strip under the court
+  c.fillStyle = COL.ink; c.textBaseline = 'alphabetic';
+  c.font = '2.2px "Permanent Marker", cursive'; c.textAlign = 'left';
+  c.fillText((play.name || 'Untitled').toUpperCase().slice(0, 28), 0, CH + 3.6);
+  c.font = '600 1.7px "Barlow Condensed", sans-serif'; c.textAlign = 'right';
+  c.fillStyle = '#5a6774';
+  c.fillText(k === 0 ? 'START' : `STEP ${k} OF ${play.steps.length - 1}`, CW, CH + 3.5);
+}
+
+// ---------- canvas sizing ----------
+let px = 300, scale = 1;
+function setTransform(c, size, dpr) {
+  const s = size / WW;
+  c.setTransform(s * dpr, 0, 0, s * dpr, MX * s * dpr, MT * s * dpr);
+  return s;
+}
+function resize() {
+  const w = $('wrap');
+  px = Math.floor(Math.min(w.clientWidth, w.clientHeight));
+  if (px < 50) return;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = px * dpr; cv.height = px * dpr; cv.style.width = cv.style.height = px + 'px';
+  scale = setTransform(ctx, px, dpr);
+  render();
+}
+new ResizeObserver(resize).observe($('wrap'));
+
+function render() {
+  if (anim) return;
+  const opts = {};
+  if (drag) { opts.hl = drag.kind === 'ball' ? drag.target : drag.p; if (drag.kind === 'ball') opts.ballAt = drag.at; }
+  drawScene(ctx, cur, 1, opts);
+}
+
+// ---------- UI ----------
+function hintText() {
+  if (hintOverride) return hintOverride;
+  if (anim) return 'Playing…';
+  if (play.steps[cur].note) return play.steps[cur].note;
+  if (cur === 0) return 'Set the starting spots. Drag the ball to give it to a player. Tap + Step to draw the next action.';
+  return 'Drag players to where they go. Drag the ball to a teammate to pass. Tap a moving player to turn their cut into a screen.';
+}
+function flash(msg) { hintOverride = msg; clearTimeout(hintTimer); hintTimer = setTimeout(() => { hintOverride = null; renderUI(); }, 2600); renderUI(); }
+function renderUI() {
+  $('hint').textContent = hintText();
+  const steps = $('steps'); steps.innerHTML = '';
+  play.steps.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (i === cur ? ' sel' : ''); b.textContent = i === 0 ? 'Start' : i;
+    b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', i === cur);
+    b.onclick = () => { stopAnim(); cur = i; renderUI(); render(); };
+    steps.appendChild(b);
+  });
+  const add = document.createElement('button');
+  add.className = 'chip add'; add.textContent = '+ Step'; add.id = 'addStep';
+  add.onclick = addStep; steps.appendChild(add);
+  const sel = steps.children[cur]; if (sel) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  $('undoBtn').disabled = !undoStack.length;
+  $('delStepBtn').disabled = play.steps.length < 2;
+  $('delStepBtn').textContent = cur === 0 ? 'Remove start' : 'Remove step';
+  $('defBtn').textContent = play.showDefense ? 'Defense: on' : 'Defense: off';
+  $('defBtn').classList.toggle('on', play.showDefense);
+  $('speedBtn').textContent = SPEEDS[speedIdx][0];
+  $('playBtn').textContent = anim ? '■ Stop' : '▶ Play';
+  if (document.activeElement !== $('playName')) $('playName').value = play.name;
+}
+function pushUndo() {
+  undoStack.push(JSON.stringify({ play, cur }));
+  if (undoStack.length > 60) undoStack.shift();
+  delete play.unsaved;
+}
+function changed() { save(); renderUI(); render(); }
+
+function addStep() {
+  stopAnim(); pushUndo();
+  play.steps.splice(cur + 1, 0, cloneStep(play.steps[cur]));
+  cur++; changed();
+  requestAnimationFrame(() => $('steps').children[cur]?.scrollIntoView({ inline: 'nearest' }));
+}
+$('delStepBtn').onclick = () => {
+  if (play.steps.length < 2) return;
+  stopAnim(); pushUndo();
+  play.steps.splice(cur, 1);
+  if (cur === 0) play.steps[0].screens = {};
+  cur = Math.max(0, cur - 1); changed();
+};
+$('undoBtn').onclick = () => {
+  const s = undoStack.pop(); if (!s) return;
+  stopAnim(); const o = JSON.parse(s); play = o.play; cur = Math.min(o.cur, play.steps.length - 1); changed();
+};
+$('defBtn').onclick = () => { pushUndo(); play.showDefense = !play.showDefense; changed(); };
+$('speedBtn').onclick = () => { speedIdx = (speedIdx + 1) % SPEEDS.length; renderUI(); };
+$('playName').oninput = e => { if (play.unsaved) delete play.unsaved; play.name = e.target.value; save(); render(); };
+$('playName').onblur = () => { if (!play.name.trim()) { play.name = 'Untitled'; save(); renderUI(); render(); } };
+
+// ---------- dragging on the court ----------
+function toWorld(e) {
+  const r = cv.getBoundingClientRect();
+  return [(e.clientX - r.left) / scale - MX, (e.clientY - r.top) / scale - MT];
+}
+const clampW = p => [Math.max(-1, Math.min(CW + 1, p[0])), Math.max(-1, Math.min(CH + 1, p[1]))];
+function nearestPlayer(pt, list, max) {
+  let best = null, bd = max;
+  for (const p of list) { const d = dist(pt, play.steps[cur].pos[p]); if (d < bd) { bd = d; best = p; } }
+  return best;
+}
+cv.addEventListener('pointerdown', e => {
+  if (anim) { stopAnim(); return; }
+  const pt = toWorld(e), step = play.steps[cur];
+  cv.setPointerCapture(e.pointerId);
+  if (dist(pt, ballSpot(step.pos[step.ball])) < 1.9) {
+    drag = { kind: 'ball', start: pt, at: ballSpot(step.pos[step.ball]), target: step.ball, moved: false };
+  } else {
+    const list = play.showDefense ? [...OFF, ...DEF] : OFF;
+    const p = nearestPlayer(pt, list, 3.6);
+    if (!p) return;
+    const old = step.pos[p].slice();
+    const followers = [];
+    for (let j = cur + 1; j < play.steps.length; j++) {
+      if (dist(play.steps[j].pos[p], old) < 0.01) followers.push(j); else break;
+    }
+    drag = { kind: 'player', p, start: pt, grab: [old[0] - pt[0], old[1] - pt[1]], followers, moved: false };
+  }
+  render();
+});
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const pt = toWorld(e);
+  if (!drag.moved && dist(pt, drag.start) * scale < 6) return;
+  if (!drag.moved) { drag.moved = true; pushUndo(); }
+  if (drag.kind === 'player') {
+    const np = clampW([pt[0] + drag.grab[0], pt[1] + drag.grab[1]]);
+    play.steps[cur].pos[drag.p] = np;
+    for (const j of drag.followers) play.steps[j].pos[drag.p] = np.slice();
+  } else {
+    drag.at = pt;
+    drag.target = nearestPlayer(pt, OFF, 4.5);
+  }
+  render();
+});
+function endDrag() {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (d.kind === 'ball' && d.moved) {
+    if (d.target) {
+      const step = play.steps[cur], old = step.ball;
+      step.ball = d.target;
+      for (let j = cur + 1; j < play.steps.length && play.steps[j].ball === old; j++) play.steps[j].ball = d.target;
+      if (old !== d.target && cur > 0) flash(`Pass from ${old[1]} to ${d.target[1]}.`);
+    }
+    changed(); return;
+  }
+  if (d.kind === 'player' && !d.moved) {
+    const p = d.p;
+    if (cur > 0 && OFF.includes(p) && dist(play.steps[cur - 1].pos[p], play.steps[cur].pos[p]) >= 0.5) {
+      pushUndo();
+      const s = play.steps[cur].screens;
+      if (s[p]) delete s[p]; else s[p] = true;
+      flash(s[p] ? `${p[1]} now sets a screen.` : `${p[1]} is back to a cut.`);
+      changed(); return;
+    }
+    if (cur === 0) flash('Drag to move. On a later step, tap a moving player to make it a screen.');
+    else flash('Drag this player first to give them a path.');
+  }
+  if (d.moved) changed(); else render();
+}
+cv.addEventListener('pointerup', endDrag);
+cv.addEventListener('pointercancel', endDrag);
+
+// ---------- timeline shared by Play and GIF ----------
+function timeline() {
+  const f = SPEEDS[speedIdx][1], segs = [{ k: 0, move: false, dur: 0.9 * f }];
+  for (let k = 1; k < play.steps.length; k++) {
+    segs.push({ k, move: true, dur: 1.1 * f });
+    segs.push({ k, move: false, dur: (k === play.steps.length - 1 ? 1.6 : 0.45) * f });
+  }
+  return segs;
+}
+function frameAt(segs, time) {
+  for (const s of segs) {
+    if (time < s.dur) return { k: s.k, t: s.move ? time / s.dur : 1 };
+    time -= s.dur;
+  }
+  const last = segs[segs.length - 1]; return { k: last.k, t: 1 };
+}
+function stopAnim() { if (!anim) return; cancelAnimationFrame(anim.raf); anim = null; renderUI(); render(); }
+$('playBtn').onclick = () => {
+  if (anim) return stopAnim();
+  if (play.steps.length < 2) return flash('Add a step first so there is something to animate.');
+  const segs = timeline(), total = segs.reduce((a, s) => a + s.dur, 0);
+  anim = { start: performance.now() };
+  const tick = now => {
+    const el = (now - anim.start) / 1000;
+    const { k, t } = frameAt(segs, el);
+    drawScene(ctx, k, t);
+    if (el >= total) { anim = null; cur = play.steps.length - 1; renderUI(); render(); return; }
+    anim.raf = requestAnimationFrame(tick);
+  };
+  renderUI();
+  anim.raf = requestAnimationFrame(tick);
+};
+
+// ---------- GIF export ----------
+let gifBlob = null, gifUrl = null, gifJob = 0;
+const downloadsP = window.claude && window.claude.use ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
+$('gifBtn').onclick = async () => {
+  if (play.steps.length < 2) return flash('Add at least one step to make a GIF.');
+  stopAnim();
+  const job = ++gifJob;
+  $('gifSheet').hidden = false; $('gifImg').hidden = true; $('saveGif').hidden = true;
+  $('gifProg').hidden = false; $('gifProg').firstElementChild.style.width = '0%';
+  $('gifStatus').textContent = 'Drawing frames…';
+  try {
+    const { GIFEncoder, quantize, applyPalette } = await import('https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js');
+    await document.fonts.ready;
+    const size = 480, off = document.createElement('canvas');
+    off.width = off.height = size;
+    const oc = off.getContext('2d', { willReadFrequently: true });
+    const segs = timeline(), fps = 20, gif = GIFEncoder();
+    const frames = [];
+    for (const s of segs) {
+      if (!s.move) frames.push({ k: s.k, t: 1, delay: Math.round(s.dur * 1000) });
+      else { const n = Math.max(2, Math.round(s.dur * fps)); for (let i = 1; i <= n; i++) frames.push({ k: s.k, t: i / n, delay: Math.round(1000 / fps) }); }
+    }
+    for (let i = 0; i < frames.length; i++) {
+      if (job !== gifJob) return;
+      const f = frames[i];
+      oc.setTransform(1, 0, 0, 1, 0, 0); setTransform(oc, size, 1);
+      drawScene(oc, f.k, f.t);
+      const { data } = oc.getImageData(0, 0, size, size);
+      const palette = quantize(data, 64);
+      gif.writeFrame(applyPalette(data, palette), size, size, { palette, delay: f.delay });
+      if (i % 4 === 0) {
+        $('gifProg').firstElementChild.style.width = Math.round((i / frames.length) * 100) + '%';
+        $('gifStatus').textContent = `Drawing frame ${i + 1} of ${frames.length}`;
+        await new Promise(r => setTimeout(r, 0));
+      }
+    }
+    gif.finish();
+    gifBlob = new Blob([gif.bytes()], { type: 'image/gif' });
+    if (gifUrl) URL.revokeObjectURL(gifUrl);
+    gifUrl = URL.createObjectURL(gifBlob);
+    $('gifImg').src = gifUrl; $('gifImg').hidden = false; $('gifProg').hidden = true;
+    const dl = await downloadsP;
+    $('saveGif').hidden = false;
+    $('gifStatus').textContent = `Tap Save GIF, or press and hold the image to save it. ${(gifBlob.size / 1024).toFixed(0)} KB`;
+  } catch (e) {
+    console.error(e);
+    $('gifStatus').textContent = 'The GIF could not be made. Check your connection and try again.';
+  }
+};
+$('saveGif').onclick = async () => {
+  const dl = await downloadsP; if (!gifBlob) return;
+  const name = (play.name || 'play').replace(/[^\w\- &]+/g, '').trim() || 'play';
+  if (!dl) {
+    const file = new File([gifBlob], name + '.gif', { type: 'image/gif' });
+    // iPhone: the share sheet has Save Image; desktop browsers get a normal download
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); } catch {} return; }
+    const a = document.createElement('a'); a.href = gifUrl; a.download = file.name; a.click(); return;
+  }
+  try { await dl.save({ filename: name + '.gif', data: gifBlob }); $('gifStatus').textContent = 'Saved.'; }
+  catch (e) {
+    if (e && e.code === 'declined') return;
+    $('gifStatus').textContent = 'Saving is not available here. Press and hold the image to save it instead.';
+  }
+};
+$('closeGif').onclick = () => { gifJob++; $('gifSheet').hidden = true; };
+
+// ---------- playbook sheet ----------
+let armed = null;
+function renderPlays() {
+  const ul = $('playsList'); ul.innerHTML = '';
+  const list = [...library.values()].sort((a, b) => (b.updated || 0) - (a.updated || 0));
+  for (const p of list) {
+    const li = document.createElement('li');
+    const open = document.createElement('button');
+    open.className = 'open' + (p.id === play.id ? ' cur' : '');
+    const b = document.createElement('b'); b.textContent = p.name || 'Untitled';
+    const sp = document.createElement('span'); const n = p.steps.length - 1;
+    sp.textContent = `${n} step${n === 1 ? '' : 's'} · edited ${new Date(p.updated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
+    open.append(b, sp);
+    open.onclick = () => { openPlay(p.id); $('playsSheet').hidden = true; };
+    const del = document.createElement('button');
+    del.className = 'del' + (armed === p.id ? ' armed' : '');
+    del.textContent = armed === p.id ? 'Tap to delete' : 'Delete';
+    del.onclick = () => {
+      if (armed !== p.id) { armed = p.id; renderPlays(); return; }
+      armed = null; removePlay(p.id);
+      if (p.id === play.id) { const next = mostRecent(); if (next) openPlay(next.id); else { play = newPlay(); library.set(play.id, play); save(); cur = 0; undoStack = []; changed(); } }
+      renderPlays();
+    };
+    li.append(open, del); ul.appendChild(li);
+  }
+  $('storeNote').textContent = store.coll ? 'Plays save to your Claude account automatically.' : 'Plays save in this browser automatically.';
+}
+function openPlay(id) {
+  stopAnim();
+  play = library.get(id); cur = 0; undoStack = [];
+  renderUI(); render();
+}
+$('playsBtn').onclick = () => { armed = null; renderPlays(); $('playsSheet').hidden = false; };
+$('closePlays').onclick = () => { $('playsSheet').hidden = true; };
+$('newPlayBtn').onclick = () => {
+  play = newPlay(); library.set(play.id, play); save();
+  cur = 0; undoStack = []; $('playsSheet').hidden = true; renderUI(); render();
+  $('playName').focus(); $('playName').select();
+};
+// ---------- find a play: Claude lists real plays, then diagrams the one picked ----------
+const sampleP = window.claude && window.claude.use ? window.claude.use('sample').catch(() => null) : Promise.resolve(null);
+sampleP.then(s => { $('findBtn').hidden = !s; });
+const COORDS = 'Court coordinates are in feet on a half court: x 0 (left sideline) to 50 (right sideline); y 0 (baseline) to 47 (half-court line). Basket at [25,5]. Lane x 19-31, y 0-19. Free-throw line y 19. Three-point arc radius about 20 ft from the basket; corners at x 5 or 45. Top of the key is about [25,28]; wings about [8,22] and [42,22]; corners [3,3] and [47,3]; blocks [19,8] and [31,8]; elbows [19,19] and [31,19].';
+let findJob = 0;
+function findMsg(e) {
+  if (e && e.code === 'not_granted') return 'Claude is turned off for this page. You can allow it from the page’s Permissions menu.';
+  if (e && e.code === 'rate_limited') return 'Too many searches right now. Wait a minute and try again.';
+  return 'That search did not work. Try again or use different words.';
+}
+$('findBtn').onclick = () => { $('playsSheet').hidden = true; $('findSheet').hidden = false; $('findQ').focus(); };
+$('closeFind').onclick = () => { findJob++; $('findSheet').hidden = true; };
+$('findForm').onsubmit = async e => {
+  e.preventDefault();
+  const q = $('findQ').value.trim(), sample = await sampleP;
+  if (!q || !sample) return;
+  const job = ++findJob;
+  $('findList').innerHTML = ''; $('findStatus').textContent = 'Searching…'; $('findGo').disabled = true;
+  try {
+    const res = await sample.json(`You are a basketball coaching assistant. A coach searched for: "${q}".
+List up to 6 real, commonly taught basketball plays, sets or actions that match the search. Only include plays you can describe accurately.
+Reply with JSON only: {"plays":[{"name":"short play name","summary":"one sentence on what it does and who it is for"}]}. If nothing matches, reply {"plays":[]}.`, { modelTier: 'quick' });
+    if (job !== findJob) return;
+    const plays = Array.isArray(res && res.plays) ? res.plays.filter(p => p && typeof p.name === 'string').slice(0, 6) : [];
+    $('findStatus').textContent = plays.length ? 'Tap a play to draw it.' : 'No plays matched. Try another name or describe the action.';
+    for (const p of plays) {
+      const li = document.createElement('li'), b = document.createElement('button');
+      b.className = 'open';
+      const t = document.createElement('b'); t.textContent = p.name;
+      const s = document.createElement('span'); s.textContent = String(p.summary || '');
+      b.append(t, s); b.onclick = () => importPlay(p.name, String(p.summary || ''));
+      li.append(b); $('findList').appendChild(li);
+    }
+  } catch (err) { if (job === findJob) $('findStatus').textContent = findMsg(err); }
+  finally { $('findGo').disabled = false; }
+};
+async function importPlay(name, summary) {
+  const sample = await sampleP, job = ++findJob;
+  $('findStatus').textContent = `Drawing ${name}…`;
+  for (const b of $('findList').querySelectorAll('button')) b.disabled = true;
+  try {
+    const res = await sample.json(`Diagram the basketball play "${name}" (${summary}) for a playbook app.
+${COORDS}
+Offensive players are o1 (point guard) through o5 (center). Defense is added automatically, so do not include it.
+Reply with JSON only, in this shape:
+{"name":"${name}","start":{"o1":[x,y],"o2":[x,y],"o3":[x,y],"o4":[x,y],"o5":[x,y]},"ball":"o1",
+ "steps":[{"note":"one short coaching sentence for this step","moves":{"o5":[x,y]},"ball":"o1","screens":["o5"]}]}
+Rules: 3 to 6 steps. "moves" lists only players who move in that step, with their new spot. "ball" is who has the ball at the END of the step (a change means a pass). "screens" lists players whose move in that step ends in a screen. Keep players at least 4 ft apart unless one is screening the other.`, { modelTier: 'default' });
+    if (job !== findJob) return;
+    const p = playFromDiagram(res, name, summary);
+    library.set(p.id, p); play = p; save();
+    cur = 0; undoStack = []; $('findSheet').hidden = true; renderUI(); render();
+  } catch (err) {
+    if (job === findJob) $('findStatus').textContent = err instanceof Error ? 'Claude’s drawing did not make sense. Try that play again or pick another.' : findMsg(err);
+  } finally { for (const b of $('findList').querySelectorAll('button')) b.disabled = false; }
+}
+// Validates Claude's answer (untrusted) and turns it into a play; defenders shadow their man.
+function playFromDiagram(d, name, summary) {
+  const spot = v => Array.isArray(v) && v.length === 2 && v.every(Number.isFinite) ? [Math.max(0, Math.min(CW, v[0])), Math.max(0, Math.min(CH, v[1]))] : null;
+  const isOff = b => OFF.includes(b);
+  const withDefense = pos => { OFF.forEach((k, i) => pos[DEF[i]] = guard(pos[k])); return pos; };
+  const base = formation(), start = {};
+  for (const k of OFF) start[k] = spot(d && d.start && d.start[k]) || base[k];
+  const p = newPlay(String((d && d.name) || name).slice(0, 40));
+  p.steps = [{ pos: withDefense(start), ball: isOff(d && d.ball) ? d.ball : 'o1', screens: {}, note: summary }];
+  const steps = Array.isArray(d && d.steps) ? d.steps.slice(0, 10) : [];
+  for (const s of steps) {
+    const prev = p.steps[p.steps.length - 1], next = cloneStep(prev);
+    for (const k of OFF) { const v = spot(s && s.moves && s.moves[k]); if (v) next.pos[k] = v; }
+    withDefense(next.pos);
+    if (s && isOff(s.ball)) next.ball = s.ball;
+    for (const k of Array.isArray(s && s.screens) ? s.screens : []) if (isOff(k) && dist(prev.pos[k], next.pos[k]) >= 0.5) next.screens[k] = true;
+    if (s && typeof s.note === 'string') next.note = s.note.slice(0, 160);
+    p.steps.push(next);
+  }
+  if (p.steps.length < 2) throw new Error('no steps');
+  return p;
+}
+
+for (const id of ['playsSheet', 'gifSheet', 'findSheet']) $(id).addEventListener('click', e => { if (e.target.id === id) { if (id === 'gifSheet') gifJob++; $(id).hidden = true; } });
+
+// ---------- boot ----------
+merge(readLocal());
+if (library.size) play = mostRecent();
+else { play = samplePlay(); play.unsaved = true; library.set(play.id, play); }
+renderUI(); resize();
+document.fonts.ready.then(render);
+initCloud();
+})();
+</script>
+
+</body></html>
