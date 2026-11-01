@@ -1,0 +1,3 @@
+# gcschalktalk.netlify.app serves the Grace team site, not the app at the repo root
+[build]
+  publish = "grace-site"
