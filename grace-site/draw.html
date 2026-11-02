@@ -313,11 +313,12 @@ async function initCloud() {
 // ---------- derived movement for a step ----------
 function movesFor(k) {
   if (k <= 0) return { moves: [], pass: null };
-  const a = play.steps[k - 1], b = play.steps[k], moves = [];
+  const a = play.steps[k - 1], b = play.steps[k], moves = [], dPlay = play.side === 'defense';
   for (const p of [...OFF, ...DEF]) {
     if (DEF.includes(p) && !play.showDefense) continue;
     if (dist(a.pos[p], b.pos[p]) < 0.5) continue;
-    const type = DEF.includes(p) ? 'def' : b.screens[p] ? 'screen' : a.ball === p ? 'dribble' : 'cut';
+    // in a defense play the defenders' rotations are the main lines and offense movement is faint
+    const type = DEF.includes(p) ? (dPlay ? 'rotate' : 'def') : dPlay ? 'faint' : b.screens[p] ? 'screen' : a.ball === p ? 'dribble' : 'cut';
     moves.push({ p, from: a.pos[p], to: b.pos[p], type });
   }
   const pass = a.ball !== b.ball ? { from: a.ball, to: b.ball } : null;
@@ -380,15 +381,15 @@ function drawLine(c, from, to, type, frac, startTrim, endTrim) {
   const u = [(to[0] - from[0]) / L, (to[1] - from[1]) / L];
   const a = [from[0] + u[0] * startTrim, from[1] + u[1] * startTrim];
   const b = [to[0] - u[0] * endTrim, to[1] - u[1] * endTrim];
-  const color = type === 'def' ? COL.def : COL.ink;
+  const color = type === 'def' || type === 'rotate' ? COL.def : COL.ink, faint = type === 'def' || type === 'faint';
   c.strokeStyle = color; c.fillStyle = color; c.lineCap = 'round'; c.lineJoin = 'round';
-  c.lineWidth = type === 'def' ? 0.2 : 0.3;
-  c.globalAlpha = type === 'def' ? 0.55 : 1;
-  c.setLineDash(type === 'pass' ? [0.8, 0.75] : type === 'def' ? [0.4, 0.5] : []);
+  c.lineWidth = faint ? 0.2 : 0.3;
+  c.globalAlpha = faint ? 0.55 : 1;
+  c.setLineDash(type === 'pass' ? [0.8, 0.75] : faint ? [0.4, 0.5] : []);
   const pts = type === 'dribble' ? zigzag(a, b) : [a, b];
   strokePartial(c, pts, frac);
   c.setLineDash([]);
-  if (frac >= 1 && type !== 'def') {
+  if (frac >= 1 && !faint) {
     if (type === 'screen') {
       c.lineWidth = 0.45; const n = [-u[1], u[0]];
       c.beginPath(); c.moveTo(b[0] + n[0] * 1.6, b[1] + n[1] * 1.6); c.lineTo(b[0] - n[0] * 1.6, b[1] - n[1] * 1.6); c.stroke();
@@ -479,6 +480,9 @@ function hintText() {
   if (hintOverride) return hintOverride;
   if (anim) return 'Playing…';
   if (play.steps[cur].note) return play.steps[cur].note;
+  if (play.side === 'defense') return cur === 0
+    ? 'Set the defense’s starting spots (red X’s) and the offense around it. Tap + Step to show the first rotation.'
+    : 'Drag defenders to their new spots. Move the ball or offense to show what the defense reacts to.';
   if (cur === 0) return 'Set the starting spots. Drag the ball to give it to a player. Tap + Step to draw the next action.';
   return 'Drag players to where they go. Drag the ball to a teammate to pass. Tap a moving player to turn their cut into a screen.';
 }
@@ -500,8 +504,8 @@ function renderUI() {
   $('undoBtn').disabled = !undoStack.length;
   $('delStepBtn').disabled = play.steps.length < 2;
   $('delStepBtn').textContent = cur === 0 ? 'Remove start' : 'Remove step';
-  $('defBtn').textContent = play.showDefense ? 'Defense: on' : 'Defense: off';
-  $('defBtn').classList.toggle('on', play.showDefense);
+  $('defBtn').textContent = play.side === 'defense' ? 'Defense play' : play.showDefense ? 'Offense + D' : 'Offense only';
+  $('defBtn').classList.toggle('on', play.side === 'defense');
   $('speedBtn').textContent = SPEEDS[speedIdx][0];
   $('playBtn').textContent = anim ? '■ Stop' : '▶ Play';
   if (document.activeElement !== $('playName')) $('playName').value = play.name;
@@ -530,7 +534,14 @@ $('undoBtn').onclick = () => {
   const s = undoStack.pop(); if (!s) return;
   stopAnim(); const o = JSON.parse(s); play = o.play; cur = Math.min(o.cur, play.steps.length - 1); changed();
 };
-$('defBtn').onclick = () => { pushUndo(); play.showDefense = !play.showDefense; changed(); };
+// cycles Offense + D → Offense only → Defense play
+$('defBtn').onclick = () => {
+  pushUndo();
+  if (play.side === 'defense') { delete play.side; play.showDefense = true; flash('Offense play with defenders shown.'); }
+  else if (play.showDefense) { play.showDefense = false; flash('Offense play, defenders hidden.'); }
+  else { play.side = 'defense'; play.showDefense = true; flash('Defense play: the defenders’ moves are the main lines.'); }
+  changed();
+};
 $('speedBtn').onclick = () => { speedIdx = (speedIdx + 1) % SPEEDS.length; renderUI(); };
 $('playName').oninput = e => { if (play.unsaved) delete play.unsaved; play.name = e.target.value; save(); render(); };
 $('playName').onblur = () => { if (!play.name.trim()) { play.name = 'Untitled'; save(); renderUI(); render(); } };
@@ -784,11 +795,13 @@ Reply with JSON only: {"plays":[{"name":"short play name","summary":"one sentenc
   finally { $('findGo').disabled = false; }
 };
 function diagramPrompt(name, summary) {
-  return `Diagram the basketball play "${name}"${summary ? ` (${summary})` : ''} for a playbook app.
+  return `Diagram the basketball play or defense "${name}"${summary ? ` (${summary})` : ''} for a playbook app. If I give you a link, a screenshot or a description, diagram that version.
 ${COORDS}
-Offensive players are o1 (point guard) through o5 (center). Defense is added automatically, so do not include it.
+Offensive players are o1 (point guard) through o5 (center). Defenders are x1 through x5.
+If it is an OFFENSE, set "side":"offense" and do not include defenders; they are added automatically.
+If it is a DEFENSE (a zone, press or rotation), set "side":"defense", place all five defenders in "start", and show their rotations in "moves". Still place o1-o5 as the offense they guard and move the ball between offensive players so each rotation has a reason. This is a half court with our basket at y 0.
 Reply with JSON only, in this shape:
-{"name":"${name}","summary":"one sentence on what the play does","start":{"o1":[x,y],"o2":[x,y],"o3":[x,y],"o4":[x,y],"o5":[x,y]},"ball":"o1",
+{"name":"${name}","side":"offense","summary":"one sentence on what it does","source":"the link or site you used, if any","start":{"o1":[x,y],"o2":[x,y],"o3":[x,y],"o4":[x,y],"o5":[x,y]},"ball":"o1",
  "steps":[{"note":"one short coaching sentence for this step","moves":{"o5":[x,y]},"ball":"o1","screens":["o5"]}]}
 Rules: 3 to 6 steps. "moves" lists only players who move in that step, with their new spot. "ball" is who has the ball at the END of the step (a change means a pass). "screens" lists players whose move in that step ends in a screen. Keep players at least 4 ft apart unless one is screening the other.`;
 }
@@ -810,15 +823,20 @@ async function importPlay(name, summary) {
 function playFromDiagram(d, name, summary) {
   const spot = v => Array.isArray(v) && v.length === 2 && v.every(Number.isFinite) ? [Math.max(0, Math.min(CW, v[0])), Math.max(0, Math.min(CH, v[1]))] : null;
   const isOff = b => OFF.includes(b);
-  const withDefense = pos => { OFF.forEach((k, i) => pos[DEF[i]] = guard(pos[k])); return pos; };
+  // offense plays: defenders shadow their man; defense plays: the answer places the defenders
+  const isDefense = d && d.side === 'defense', movers = isDefense ? [...OFF, ...DEF] : OFF;
+  const withDefense = pos => { if (!isDefense) OFF.forEach((k, i) => pos[DEF[i]] = guard(pos[k])); return pos; };
   const base = formation(), start = {};
   for (const k of OFF) start[k] = spot(d && d.start && d.start[k]) || base[k];
+  DEF.forEach((k, i) => start[k] = (isDefense && spot(d.start && d.start[k])) || guard(start[OFF[i]]));
   const p = newPlay(String((d && d.name) || name).slice(0, 40));
+  if (isDefense) p.side = 'defense';
+  if (d && typeof d.source === 'string' && d.source.trim()) p.source = d.source.trim().slice(0, 200);
   p.steps = [{ pos: withDefense(start), ball: isOff(d && d.ball) ? d.ball : 'o1', screens: {}, note: summary || (typeof (d && d.summary) === 'string' ? d.summary.slice(0, 200) : '') }];
   const steps = Array.isArray(d && d.steps) ? d.steps.slice(0, 10) : [];
   for (const s of steps) {
     const prev = p.steps[p.steps.length - 1], next = cloneStep(prev);
-    for (const k of OFF) { const v = spot(s && s.moves && s.moves[k]); if (v) next.pos[k] = v; }
+    for (const k of movers) { const v = spot(s && s.moves && s.moves[k]); if (v) next.pos[k] = v; }
     withDefense(next.pos);
     if (s && isOff(s.ball)) next.ball = s.ball;
     for (const k of Array.isArray(s && s.screens) ? s.screens : []) if (isOff(k) && dist(prev.pos[k], next.pos[k]) >= 0.5) next.screens[k] = true;
