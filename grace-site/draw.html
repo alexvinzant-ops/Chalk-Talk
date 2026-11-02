@@ -117,6 +117,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .plays .del.armed { background: #c62f2f; border-color: #c62f2f; color: #fff; }
 .find-input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--chip); border-radius: 10px; padding: 9px 12px; }
 .store-note { margin: 0; color: var(--muted); font-size: 13px; }
+.paste-box { font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; resize: vertical; }
 .gif-box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .gif-box img { width: 100%; max-width: 420px; border-radius: 6px; -webkit-touch-callout: default; }
 .progress { width: 100%; height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; }
@@ -152,9 +153,41 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
     <div class="row">
       <button class="btn primary" id="newPlayBtn">+ New play</button>
       <button class="btn" id="findBtn" hidden>Find a play</button>
+      <button class="btn" id="pasteBtn">Paste a play</button>
     </div>
     <ul class="plays" id="playsList"></ul>
     <p class="store-note" id="storeNote"></p>
+    <button class="btn" id="teamBtn">Add this play to the team playbook</button>
+    <p class="store-note" id="teamStatus"></p>
+  </div>
+</div>
+
+<div class="sheet" id="pasteSheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Paste a play</h2><button class="btn" id="closePaste">Done</button></div>
+    <label class="store-note" for="pasteName">1. Name the play and copy the instructions for Claude</label>
+    <div class="row">
+      <input id="pasteName" class="find-input" placeholder="Horns Flex, UCLA cut, Spain pick and roll…" autocomplete="off">
+      <button class="btn" id="copyPrompt">Copy</button>
+    </div>
+    <label class="store-note" for="pasteBox">2. Paste the instructions into Claude, then paste Claude’s answer here</label>
+    <textarea id="pasteBox" class="find-input paste-box" rows="6" spellcheck="false"></textarea>
+    <button class="btn primary" id="pasteGo">Add play</button>
+    <p class="store-note" id="pasteStatus"></p>
+  </div>
+</div>
+
+<div class="sheet" id="ghSheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Coach setup</h2><button class="btn" id="closeGh">Cancel</button></div>
+    <p class="store-note">Adding plays for the team saves them to your GitHub repository, and the website updates about a minute later. Do this once, only on your own phone or computer.</p>
+    <p class="store-note">On github.com, open Settings → Developer settings → Fine-grained tokens → Generate new token. Pick only the Chalk-Talk repository and give it Contents: Read and write.</p>
+    <label class="store-note" for="ghRepo">Repository</label>
+    <input id="ghRepo" class="find-input" autocomplete="off" value="alexvinzant-ops/Chalk-Talk">
+    <label class="store-note" for="ghToken">Access token</label>
+    <input id="ghToken" class="find-input" type="password" autocomplete="off" placeholder="github_pat_…">
+    <button class="btn primary" id="ghSave">Save and add the play</button>
+    <p class="store-note" id="ghStatus"></p>
   </div>
 </div>
 
@@ -750,18 +783,21 @@ Reply with JSON only: {"plays":[{"name":"short play name","summary":"one sentenc
   } catch (err) { if (job === findJob) $('findStatus').textContent = findMsg(err); }
   finally { $('findGo').disabled = false; }
 };
+function diagramPrompt(name, summary) {
+  return `Diagram the basketball play "${name}"${summary ? ` (${summary})` : ''} for a playbook app.
+${COORDS}
+Offensive players are o1 (point guard) through o5 (center). Defense is added automatically, so do not include it.
+Reply with JSON only, in this shape:
+{"name":"${name}","summary":"one sentence on what the play does","start":{"o1":[x,y],"o2":[x,y],"o3":[x,y],"o4":[x,y],"o5":[x,y]},"ball":"o1",
+ "steps":[{"note":"one short coaching sentence for this step","moves":{"o5":[x,y]},"ball":"o1","screens":["o5"]}]}
+Rules: 3 to 6 steps. "moves" lists only players who move in that step, with their new spot. "ball" is who has the ball at the END of the step (a change means a pass). "screens" lists players whose move in that step ends in a screen. Keep players at least 4 ft apart unless one is screening the other.`;
+}
 async function importPlay(name, summary) {
   const sample = await sampleP, job = ++findJob;
   $('findStatus').textContent = `Drawing ${name}…`;
   for (const b of $('findList').querySelectorAll('button')) b.disabled = true;
   try {
-    const res = await sample.json(`Diagram the basketball play "${name}" (${summary}) for a playbook app.
-${COORDS}
-Offensive players are o1 (point guard) through o5 (center). Defense is added automatically, so do not include it.
-Reply with JSON only, in this shape:
-{"name":"${name}","start":{"o1":[x,y],"o2":[x,y],"o3":[x,y],"o4":[x,y],"o5":[x,y]},"ball":"o1",
- "steps":[{"note":"one short coaching sentence for this step","moves":{"o5":[x,y]},"ball":"o1","screens":["o5"]}]}
-Rules: 3 to 6 steps. "moves" lists only players who move in that step, with their new spot. "ball" is who has the ball at the END of the step (a change means a pass). "screens" lists players whose move in that step ends in a screen. Keep players at least 4 ft apart unless one is screening the other.`, { modelTier: 'default' });
+    const res = await sample.json(diagramPrompt(name, summary), { modelTier: 'default' });
     if (job !== findJob) return;
     const p = playFromDiagram(res, name, summary);
     library.set(p.id, p); play = p; save();
@@ -778,7 +814,7 @@ function playFromDiagram(d, name, summary) {
   const base = formation(), start = {};
   for (const k of OFF) start[k] = spot(d && d.start && d.start[k]) || base[k];
   const p = newPlay(String((d && d.name) || name).slice(0, 40));
-  p.steps = [{ pos: withDefense(start), ball: isOff(d && d.ball) ? d.ball : 'o1', screens: {}, note: summary }];
+  p.steps = [{ pos: withDefense(start), ball: isOff(d && d.ball) ? d.ball : 'o1', screens: {}, note: summary || (typeof (d && d.summary) === 'string' ? d.summary.slice(0, 200) : '') }];
   const steps = Array.isArray(d && d.steps) ? d.steps.slice(0, 10) : [];
   for (const s of steps) {
     const prev = p.steps[p.steps.length - 1], next = cloneStep(prev);
@@ -793,7 +829,70 @@ function playFromDiagram(d, name, summary) {
   return p;
 }
 
-for (const id of ['playsSheet', 'gifSheet', 'findSheet']) $(id).addEventListener('click', e => { if (e.target.id === id) { if (id === 'gifSheet') gifJob++; $(id).hidden = true; } });
+// ---------- paste a play: the coach asks Claude in any chat, then pastes the JSON answer ----------
+$('pasteBtn').onclick = () => { $('playsSheet').hidden = true; $('pasteStatus').textContent = ''; $('pasteSheet').hidden = false; $('pasteName').focus(); };
+$('closePaste').onclick = () => { $('pasteSheet').hidden = true; };
+$('copyPrompt').onclick = async () => {
+  const name = $('pasteName').value.trim();
+  if (!name) { $('pasteStatus').textContent = 'Type the play’s name first.'; $('pasteName').focus(); return; }
+  const text = diagramPrompt(name, '');
+  try { await navigator.clipboard.writeText(text); $('pasteStatus').textContent = 'Copied. Paste it into Claude.'; }
+  catch { $('pasteBox').value = text; $('pasteBox').select(); $('pasteStatus').textContent = 'Copy the selected text above, then clear the box and paste Claude’s answer.'; }
+};
+$('pasteGo').onclick = () => {
+  const raw = $('pasteBox').value, a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+  let d;
+  try { d = JSON.parse(raw.slice(a, b + 1)); } catch { $('pasteStatus').textContent = 'That doesn’t look like Claude’s answer. Paste the whole reply, including the { and } brackets.'; return; }
+  try {
+    const p = playFromDiagram(d, $('pasteName').value.trim() || 'Pasted play', '');
+    library.set(p.id, p); play = p; save();
+    cur = 0; undoStack = []; $('pasteBox').value = ''; $('pasteSheet').hidden = true; renderUI(); render();
+  } catch { $('pasteStatus').textContent = 'The answer had no steps. Ask Claude to try again.'; }
+};
+
+// ---------- add to the team playbook: commits grace-site/plays.json through the GitHub API ----------
+const GH_KEY = 'chalktalk.github';
+const ghConf = () => { try { return JSON.parse(localStorage.getItem(GH_KEY)) || null; } catch { return null; } };
+const toB64 = s => { const bytes = new TextEncoder().encode(s); let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000)); return btoa(bin); };
+const fromB64 = s => new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g, '')), c => c.charCodeAt(0)));
+async function publishPlay(conf) {
+  const url = `https://api.github.com/repos/${conf.repo}/contents/grace-site/plays.json`;
+  const headers = { Authorization: `Bearer ${conf.token}`, Accept: 'application/vnd.github+json' };
+  const got = await fetch(url + '?t=' + Date.now(), { headers });
+  if (got.status === 401 || got.status === 403) throw new Error('key');
+  if (!got.ok && got.status !== 404) throw new Error('github ' + got.status);
+  const file = got.ok ? await got.json() : null;
+  const book = file ? JSON.parse(fromB64(file.content)) : { plays: [] };
+  const entry = JSON.parse(JSON.stringify(play)); delete entry.unsaved;
+  book.plays = (book.plays || []).filter(p => p.id !== entry.id).concat(entry);
+  const put = await fetch(url, { method: 'PUT', headers, body: JSON.stringify({ message: `Add ${entry.name} to the team playbook`, content: toB64(JSON.stringify(book, null, 1)), sha: file ? file.sha : undefined }) });
+  if (put.status === 401 || put.status === 403) throw new Error('key');
+  if (put.status === 409) throw new Error('conflict');
+  if (!put.ok) throw new Error('github ' + put.status);
+}
+async function addToTeam(status) {
+  const conf = ghConf();
+  if (!conf) { $('playsSheet').hidden = true; $('ghStatus').textContent = ''; $('ghSheet').hidden = false; $('ghToken').focus(); return; }
+  status.textContent = `Adding ${play.name}…`;
+  try { await publishPlay(conf); status.textContent = `Added ${play.name}. Players will see it on the team page in about a minute.`; return true; }
+  catch (e) {
+    status.textContent = e.message === 'key' ? 'GitHub turned down the access token. It may have expired: set up a new one.'
+      : e.message === 'conflict' ? 'Someone saved at the same moment. Tap Add again.'
+      : 'Couldn’t reach GitHub. Check your connection and try again.';
+    if (e.message === 'key') { try { localStorage.removeItem(GH_KEY); } catch {} }
+  }
+}
+$('teamBtn').onclick = () => addToTeam($('teamStatus'));
+$('closeGh').onclick = () => { $('ghSheet').hidden = true; };
+$('ghSave').onclick = async () => {
+  const repo = $('ghRepo').value.trim(), token = $('ghToken').value.trim();
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repo) || !token) { $('ghStatus').textContent = 'Enter the repository as owner/name and paste the token.'; return; }
+  try { localStorage.setItem(GH_KEY, JSON.stringify({ repo, token })); } catch { $('ghStatus').textContent = 'This browser can’t save the token (private browsing?).'; return; }
+  $('ghToken').value = '';
+  if (await addToTeam($('ghStatus'))) setTimeout(() => { $('ghSheet').hidden = true; }, 2500);
+};
+
+for (const id of ['playsSheet', 'gifSheet', 'findSheet', 'pasteSheet', 'ghSheet']) $(id).addEventListener('click', e => { if (e.target.id === id) { if (id === 'gifSheet') gifJob++; $(id).hidden = true; } });
 
 // ---------- boot ----------
 merge(readLocal());

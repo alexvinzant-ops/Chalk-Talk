@@ -111,8 +111,15 @@ $('zoom').onclick=()=>{$('courtarea').classList.add('expanded');$('closezoom').f
 $('closezoom').onclick=()=>{$('courtarea').classList.remove('expanded');$('zoom').focus()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('closezoom').click()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)paused()});
-$('navigation').innerHTML='';$('mobileSelect').innerHTML='';$('courtarea').classList.remove('expanded');
-for(const group of [...new Set(plays.map(x=>x.group))]){const block=document.createElement('div');block.className='group';block.innerHTML='<h2>'+esc(group)+'</h2>';const opt=document.createElement('optgroup');opt.label=group;for(const item of plays.filter(x=>x.group===group)){const b=document.createElement('button');b.className='navitem';b.dataset.id=item.id;b.innerHTML='<b>'+esc(item.title)+'</b><span>'+esc(item.alias)+'</span>';b.onclick=()=>choose(item.id);block.append(b);const option=document.createElement('option');option.value=item.id;option.textContent=item.title;opt.append(option)}$('navigation').append(block);$('mobileSelect').append(opt)}
-$('logo').src=ASSETS.logo;choose('bama');
+$('courtarea').classList.remove('expanded');
+function buildNav(){$('navigation').innerHTML='';$('mobileSelect').innerHTML='';
+for(const group of [...new Set(plays.map(x=>x.group))]){const block=document.createElement('div');block.className='group';block.innerHTML='<h2>'+esc(group)+'</h2>';const opt=document.createElement('optgroup');opt.label=group;for(const item of plays.filter(x=>x.group===group)){const b=document.createElement('button');b.className='navitem';b.dataset.id=item.id;b.innerHTML='<b>'+esc(item.title)+'</b><span>'+esc(item.alias)+'</span>';b.onclick=()=>choose(item.id);block.append(b);const option=document.createElement('option');option.value=item.id;option.textContent=item.title;opt.append(option)}$('navigation').append(block);$('mobileSelect').append(opt)}}
+// Plays the coach adds from Draw a play (draw.html) live in plays.json, in the designer's format: feet, basket at y=0.
+// Rotated 180°, not flipped, so the strong side stays the same side for the players.
+const OFF5=['o1','o2','o3','o4','o5'],toCourt=([x,y])=>[550-x*10,Math.max(70,490-y*10)];
+function fromDesigner(p){const steps=p.steps.map((s,i)=>{const o=OFF5.map(k=>toCourt(s.pos[k]));return{o,d:[],ball:o[Math.max(0,OFF5.indexOf(s.ball))],screens:Object.keys(s.screens||{}).map(k=>OFF5.indexOf(k)).filter(n=>n>=0),dribble:i>0&&p.steps[i-1].ball===s.ball,title:i?'Step '+i:'Starting spots',text:s.note||(i?'Watch the movement and the ball.':'Find your starting spot and the ball.')}});
+return{id:'added-'+p.id,title:String(p.name||'Untitled'),alias:'Added play',group:'Added plays',type:'diagram',steps,description:p.steps[0].note||'Added by the coach from Draw a play.',reminders:['Find your starting spot first.','Say your next action out loud before you move.'],source:'Added by the coach with Draw a play. Check it against practice before game use.'}}
+buildNav();$('logo').src=ASSETS.logo;choose('bama');
+fetch('plays.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(book=>{if(!book||!Array.isArray(book.plays))return;for(const p of book.plays){try{if(p&&Array.isArray(p.steps)&&p.steps.length>1)plays.push(fromDesigner(p))}catch(e){console.warn('skipped play',e)}}buildNav();if(!playing)choose(current.id)}).catch(()=>{});
 </script></body></html>
 
